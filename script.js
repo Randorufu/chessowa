@@ -1,3 +1,5 @@
+$(document).ready(() => {
+
 var mp = 0;
 var totalatkval = 0;
 var totalatk = document.getElementById("totalatk");
@@ -936,7 +938,7 @@ function calculate() {
   }
   totalatk.innerHTML = totalatkval;
   totalatkval = 0;
-}
+};
 
 const maxhealth = 20000;
 var totalhealthval = maxhealth;
@@ -980,4 +982,6 @@ function mpactive() {
     var element = document.getElementsByClassName("mp-items")[i];
     element.classList.add("mp-active");
   }
-}
+};
+
+});
