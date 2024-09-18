@@ -1,0 +1,146 @@
+.bg {
+  background-color: #000000;
+}
+
+* {
+ font-family: "Inconsolata", monospace;
+ color: #fff;
+}
+
+#container {
+  text-align: center;
+  padding-bottom: 50%;
+}
+
+h1 {
+  font-family: "Unica One", sans-serif;
+  margin-top: 1em;
+}
+
+.column {
+  display: inline-block;
+  margin-left: 1em;
+  margin-right: 1em;
+  margin-bottom: 1em;
+}
+
+#totalatk, .totaltxt {
+  color: #ffffff;
+  font-size: 1.5em;
+}
+
+input  {
+  background-color: transparent;
+  color: #ffffff;
+  border: none;
+  font-size: 1.5em;
+  text-align: right;
+}
+
+input:focus {
+  outline: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+#totals {
+  position: fixed;
+  text-align: right;
+  padding: 1em;
+  bottom: 0%;
+  right: 0%;
+  background-color: RGBA(0, 0, 0, 0.5);
+}
+
+.atkvalue {
+  display: inline;
+}
+
+.attackblock button {
+  display: none;
+  margin: auto;
+  width: 100%;
+}
+
+button {
+  border: none;
+  border-radius: 20%;
+  background-color: black;
+  display: block;
+  text-align: center;
+  background-color: transparent;
+  color: #666666;
+}
+
+.atkinc {
+  position: relative;
+  top: 0.3em;
+  color: #666666; 
+}
+
+.atkdecr {
+  position: relative;
+  top: -0.3em;
+}
+
+.piece-flex {
+  display: flex;
+  -webkit-flex-direction: row; 
+  flex-direction: row;
+  align-items: center;
+  justify: center;
+}
+
+.piece-icon {
+  font-size: 3em;
+  color: #666666; 
+}
+
+.atkvalue, .atktxt {
+  font-size: 1.5em;
+  color: #666666;
+}
+
+#dmgbutton{
+  display: inline;
+  font-size: 1.2em;
+}
+
+#totalhealth {
+ font-size: 1.5em; 
+}
+
+.hpbutton {
+  display: inline;
+  font-size: 1.5em;
+}
+
+#mp, #mptxt {
+  font-size: 1.5em;
+}
+
+#mp-flex {
+  display: inline-flex;
+  justify-content: space-between;
+  width: 200px;
+}
+
+.mp-items {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  background-color: #666;
+  border-radius: 50%;
+}
+
+.mp-active {
+  background-color: #fff;
+}
