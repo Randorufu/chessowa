@@ -973,6 +973,14 @@ hpbuttoninc.addEventListener("click", function () {
 });
 
 function mpactive() {
+  if (mp > 7) {
+    mp = 7;
+  } 
+
+  if (mp < 0) {
+    mp = 0;
+  } 
+  
   for (let i = 0; i < 7; i++) {
     var element = document.getElementsByClassName("mp-items")[i];
     element.classList.remove("mp-active");
