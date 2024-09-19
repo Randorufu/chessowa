@@ -155,6 +155,8 @@ button {
 .right {
   transform: rotate(-45deg);
   -webkit-transform: rotate(-45deg);
+  margin-bottom: 0.15em;
+  margin-left: -0.2em;
 }
 
 .left {
