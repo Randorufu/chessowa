@@ -43,7 +43,13 @@ kingico.addEventListener("click", function () {
     kingatkdecr.style.color = "#666666";
     kingatkinc.style.color = "#666666";
     kingico.style.color = "#ffffff";
+    if (mp < 7) {
     mp = mp + 1;
+  } else {
+    mp = 7;
+  }
+  mpdoc.innerHTML = mp;
+  mpactive();
   } else {
     kingatkdiv.innerHTML = "";
     kingtext.innerHTML = "200 ATK";
@@ -55,8 +61,6 @@ kingico.addEventListener("click", function () {
     kingico.style.color = "#666666";
   }
   calculate();
-  mpactive();
-  mpdoc.innerHTML = mp;
 });
 
 var bishop1atkval = null;
@@ -98,7 +102,13 @@ bishop1ico.addEventListener("click", function () {
     bishop1atkdecr.style.color = "#666666";
     bishop1atkinc.style.color = "#666666";
     bishop1ico.style.color = "#ffffff";
+   if (mp < 7) {
     mp = mp + 1;
+  } else {
+    mp = 7;
+  }
+  mpdoc.innerHTML = mp;
+  mpactive();
   } else {
     bishop1atkdiv.innerHTML = "";
     bishop1text.innerHTML = "100 ATK";
@@ -109,8 +119,6 @@ bishop1ico.addEventListener("click", function () {
     bishop1atkinc.style.display = "none";
     bishop1ico.style.color = "#666666";
   }
-  mpactive();
-  mpdoc.innerHTML = mp;
   calculate();
 });
 
@@ -153,7 +161,13 @@ knight1ico.addEventListener("click", function () {
     knight1atkdecr.style.color = "#666666";
     knight1atkinc.style.color = "#666666";
     knight1ico.style.color = "#ffffff";
+    if (mp < 7) {
     mp = mp + 1;
+  } else {
+    mp = 7;
+  }
+  mpdoc.innerHTML = mp;
+  mpactive();
   } else {
     knight1atkdiv.innerHTML = "";
     knight1text.innerHTML = "100 ATK";
@@ -164,8 +178,6 @@ knight1ico.addEventListener("click", function () {
     knight1atkinc.style.display = "none";
     knight1ico.style.color = "#666666";
   }
-  mpactive();
-  mpdoc.innerHTML = mp;
   calculate();
 });
 
@@ -208,7 +220,13 @@ rook1ico.addEventListener("click", function () {
     rook1atkdecr.style.color = "#666666";
     rook1atkinc.style.color = "#666666";
     rook1ico.style.color = "#ffffff";
+   if (mp < 7) {
     mp = mp + 1;
+  } else {
+    mp = 7;
+  }
+  mpdoc.innerHTML = mp;
+  mpactive();
   } else {
     rook1atkdiv.innerHTML = "";
     rook1text.innerHTML = "150 ATK";
@@ -220,8 +238,6 @@ rook1ico.addEventListener("click", function () {
     rook1ico.style.color = "#666666";
   }
   calculate();
-  mpactive();
-  mpdoc.innerHTML = mp;
 });
 
 var pawn1atkval = null;
@@ -263,7 +279,13 @@ pawn1ico.addEventListener("click", function () {
     pawn1atkdecr.style.color = "#666666";
     pawn1atkinc.style.color = "#666666";
     pawn1ico.style.color = "#ffffff";
+    if (mp < 7) {
     mp = mp + 1;
+  } else {
+    mp = 7;
+  }
+  mpdoc.innerHTML = mp;
+  mpactive();
   } else {
     pawn1atkdiv.innerHTML = "";
     pawn1text.innerHTML = "50 ATK";
@@ -274,8 +296,6 @@ pawn1ico.addEventListener("click", function () {
     pawn1atkinc.style.display = "none";
     pawn1ico.style.color = "#666666";
   }
-  mpactive();
-  mpdoc.innerHTML = mp;
   calculate();
 });
 
@@ -318,7 +338,13 @@ pawn2ico.addEventListener("click", function () {
     pawn2atkdecr.style.color = "#666666";
     pawn2atkinc.style.color = "#666666";
     pawn2ico.style.color = "#ffffff";
+    if (mp < 7) {
     mp = mp + 1;
+  } else {
+    mp = 7;
+  }
+  mpdoc.innerHTML = mp;
+  mpactive();
   } else {
     pawn2atkdiv.innerHTML = "";
     pawn2text.innerHTML = "50 ATK";
@@ -329,8 +355,6 @@ pawn2ico.addEventListener("click", function () {
     pawn2atkinc.style.display = "none";
     pawn2ico.style.color = "#666666";
   }
-  mpactive();
-  mpdoc.innerHTML = mp;
   calculate();
 });
 
@@ -373,7 +397,13 @@ pawn3ico.addEventListener("click", function () {
     pawn3atkdecr.style.color = "#666666";
     pawn3atkinc.style.color = "#666666";
     pawn3ico.style.color = "#ffffff";
+    if (mp < 7) {
     mp = mp + 1;
+  } else {
+    mp = 7;
+  }
+  mpdoc.innerHTML = mp;
+  mpactive();
   } else {
     pawn3atkdiv.innerHTML = "";
     pawn3text.innerHTML = "50 ATK";
@@ -384,8 +414,6 @@ pawn3ico.addEventListener("click", function () {
     pawn3atkinc.style.display = "none";
     pawn3ico.style.color = "#666666";
   }
-  mpactive();
-  mpdoc.innerHTML = mp;
   calculate();
 });
 
@@ -428,7 +456,13 @@ pawn4ico.addEventListener("click", function () {
     pawn4atkdecr.style.color = "#666666";
     pawn4atkinc.style.color = "#666666";
     pawn4ico.style.color = "#ffffff";
+    if (mp < 7) {
     mp = mp + 1;
+  } else {
+    mp = 7;
+  }
+  mpdoc.innerHTML = mp;
+  mpactive();
   } else {
     pawn4atkdiv.innerHTML = "";
     pawn4text.innerHTML = "50 ATK";
@@ -439,8 +473,6 @@ pawn4ico.addEventListener("click", function () {
     pawn4atkinc.style.display = "none";
     pawn4ico.style.color = "#666666";
   }
-  mpactive();
-  mpdoc.innerHTML = mp;
   calculate();
 });
 
