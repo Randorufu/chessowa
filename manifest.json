@@ -1,0 +1,40 @@
+{
+  "background_color": "#000000",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Chess'owa",
+  "orientation": "any",
+  "scope": "/chessowa/",
+  "short_name": "Chess'owa",
+  "start_url": "/chessowa/",
+  "prefer_related_applications": false,
+  "theme_color": "black",
+  "description": "Chess'owa compaion",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "type": "image/png",
+      "sizes": "16x16"
+    },
+    {
+      "src": "/chessowa/icon-192x192.png",
+      "sizes": "192x192",
+            "type": "image/png"
+    },
+    {
+            "src": "/chessowa/icon-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+    },
+    {
+            "src": "/chessowa/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png"
+    },
+    {
+            "src": "/chessowa/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+    }
+  ]
+}
