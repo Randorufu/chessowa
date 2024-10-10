@@ -112,6 +112,10 @@ button {
   justify-self: stretch;
 }
 
+.piece-flex p {
+  color: #666666;
+}
+
 .piece-icon {
   font-size: 3em;
   color: #666666; 
