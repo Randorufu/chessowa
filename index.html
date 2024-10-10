@@ -19,201 +19,282 @@
 <body class="bg">
 <div id="container">
   <h1>Chess'owa</h1>
-  <div class="column">
-    <div class="piece-flex">
-      <div>
-        <button id="kingicon" class="piece-icon">♔</button>
+
+  <div id='pieces-container'>
+    <div class='piece-container'>
+      <div class="piece-flex">
+        <div>
+          <button id="kingicon" class="piece-icon">♔</button>
+        </div>
+        <div><span class='piecename'>KING</span></div>
+        <div id="kingattackblock" class="attackblock">
+          <button id="kingatkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="kingatk" class="atkvalue"></span>
+          <span id="kingatktxt" class="atktxt">200 ATK</span>
+          <button id="kingatkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
       </div>
-      <div id="kingattackblock" class="attackblock">
-        <button id="kingatkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="kingatk" class="atkvalue"></span>
-        <span id="kingatktxt" class="atktxt">200 ATK</span>
-        <button id="kingatkdecr" class="atkdecr"><i class="arrow down"></i></button>
+
+      <div class="piece-flex">
+        <div>
+          <button id="queenicon" class="piece-icon">♕</button>
+        </div>
+        <div><span class='piecename'>QUEEN</span></div>
+        <div id="queenattackblock" class="attackblock">
+          <button id="queenatkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="queenatk" class="atkvalue"></span>
+          <span id="queenatktxt" class="atktxt">150 ATK</span>
+          <button id="queenatkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
+      </div>
+
+      <div class="piece-flex">
+        <p>When placed on the board, inflicts 200 damage OR reduces your opponent's MP by 2.</p>
+      </div>
+      <div class="piece-flex">
+        <p>When placed on the board, earn 1 extra MP. Decrease ATK by 50 for each adjacent unit.</p>
       </div>
     </div>
 
-    <div class="piece-flex">
-      <div>
-        <button id="bishop1icon" class="piece-icon">♗</button>
+    <div class='piece-container'>
+      <div class="piece-flex">
+        <div>
+          <button id="bishop1icon" class="piece-icon">♗</button>
+        </div>
+        <div><span class='piecename'>Bishop</span></div>
+        <div id="bishop1attackblock" class="attackblock">
+          <button id="bishop1atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="bishop1atk" class="atkvalue"></span>
+          <span id="bishop1atktxt" class="atktxt">100 ATK</span>
+          <button id="bishop1atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
       </div>
-      <div id="bishop1attackblock" class="attackblock">
-        <button id="bishop1atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="bishop1atk" class="atkvalue"></span>
-        <span id="bishop1atktxt" class="atktxt">100 ATK</span>
-        <button id="bishop1atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+
+      <div class="piece-flex">
+        <div>
+          <button id="bishop2icon" class="piece-icon">♗</button>
+        </div>
+        <div><span class='piecename'>Bishop</span></div>
+        <div id="bishop2attackblock" class="attackblock">
+          <button id="bishop2atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="bishop2atk" class="atkvalue"></span>
+          <span id="bishop2atktxt" class="atktxt">100 ATK</span>
+          <button id="bishop2atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
+      </div>
+      <div class="piece-flex">
+        <p>Increase the ATK of your adjacent units by 50.</p>
+      </div>
+      <div class="piece-flex">
+        <p>Increase the ATK of your adjacent units by 50.</p>
       </div>
     </div>
 
-    <div class="piece-flex">
-      <div>
-        <button id="knight1icon" class="piece-icon">♘</button>
+    <div class='piece-container'>
+      <div class="piece-flex">
+        <div>
+          <button id="knight1icon" class="piece-icon">♘</button>
+        </div>
+        <div><span class='piecename'>Knight</span></div>
+        <div id="knight1attackblock" class="attackblock">
+          <button id="knight1atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="knight1atk" class="atkvalue"></span>
+          <span id="knight1atktxt" class="atktxt">100 ATK</span>
+          <button id="knight1atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
       </div>
-      <div id="knight1attackblock" class="attackblock">
-        <button id="knight1atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="knight1atk" class="atkvalue"></span>
-        <span id="knight1atktxt" class="atktxt">100 ATK</span>
-        <button id="knight1atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+
+      <div class="piece-flex">
+        <div>
+          <button id="knight2icon" class="piece-icon">♘</button>
+        </div>
+        <div><span class='piecename'>Knight</span></div>
+        <div id="knight2attackblock" class="attackblock">
+          <button id="knight2atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="knight2atk" class="atkvalue"></span>
+          <span id="knight2atktxt" class="atktxt">100 ATK</span>
+          <button id="knight2atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
+      </div>
+      <div class="piece-flex">
+        <p>When placed on the board, sends a random adjacent enemy unit to the graveyard.</p>
+      </div>
+      <div class="piece-flex">
+        <p>When placed on the board, sends a random adjacent enemy unit to the graveyard.</p>
       </div>
     </div>
 
-    <div class="piece-flex">
-      <div>
-        <button id="rook1icon" class="piece-icon">♖</button>
+    <div class='piece-container'>
+      <div class="piece-flex">
+        <div>
+          <button id="rook1icon" class="piece-icon">♖</button>
+        </div>
+        <div><span class='piecename'>Rook</span></div>
+        <div id="rook1attackblock" class="attackblock">
+          <button id="rook1atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="rook1atk" class="atkvalue"></span>
+          <span id="rook1atktxt" class="atktxt">150 ATK</span>
+          <button id="rook1atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
       </div>
-      <div id="rook1attackblock" class="attackblock">
-        <button id="rook1atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="rook1atk" class="atkvalue"></span>
-        <span id="rook1atktxt" class="atktxt">150 ATK</span>
-        <button id="rook1atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+
+      <div class="piece-flex">
+        <div>
+          <button id="rook2icon" class="piece-icon">♖</button>
+        </div>
+        <div><span class='piecename'>Rook</span></div>
+        <div id="rook2attackblock" class="attackblock">
+          <button id="rook2atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="rook2atk" class="atkvalue"></span>
+          <span id="rook2atktxt" class="atktxt">150 ATK</span>
+          <button id="rook2atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
+      </div>
+      <div class="piece-flex">
+        <p>Increase ATK by 50 at the start of each turn.</p>
+      </div>
+      <div class="piece-flex">
+        <p>Increase ATK by 50 at the start of each turn.</p>
       </div>
     </div>
 
-    <div class="piece-flex">
-      <div>
-        <button id="pawn1icon" class="piece-icon">♙</button>
+    <div class='piece-container'>
+      <div class="piece-flex">
+        <div>
+          <button id="pawn1icon" class="piece-icon">♙</button>
+        </div>
+        <div><span class='piecename'>Pawn</span></div>
+        <div id="pawn1attackblock" class="attackblock">
+          <button id="pawn1atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="pawn1atk" class="atkvalue"></span>
+          <span id="pawn1atktxt" class="atktxt">50 ATK</span>
+          <button id="pawn1atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
       </div>
-      <div id="pawn1attackblock" class="attackblock">
-        <button id="pawn1atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="pawn1atk" class="atkvalue"></span>
-        <span id="pawn1atktxt" class="atktxt">50 ATK</span>
-        <button id="pawn1atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+
+      <div class="piece-flex">
+        <div>
+          <button id="pawn2icon" class="piece-icon">♙</button>
+        </div>
+        <div><span class='piecename'>Pawn</span></div>
+        <div id="pawn2attackblock" class="attackblock">
+          <button id="pawn2atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="pawn2atk" class="atkvalue"></span>
+          <span id="pawn2atktxt" class="atktxt">50 ATK</span>
+          <button id="pawn2atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
+      </div>
+      <div class="piece-flex">
+        <p>After you place three pawns on the board, you can put down another unit.</p>
+      </div>
+      <div class="piece-flex">
+        <p>After you place three pawns on the board, you can put down another unit.</p>
       </div>
     </div>
 
-    <div class="piece-flex">
-      <div>
-        <button id="pawn2icon" class="piece-icon">♙</button>
+    <div class='piece-container'>
+      <div class="piece-flex">
+        <div>
+          <button id="pawn3icon" class="piece-icon">♙</button>
+        </div>
+        <div><span class='piecename'>Pawn</span></div>
+        <div id="pawn3attackblock" class="attackblock">
+          <button id="pawn3atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="pawn3atk" class="atkvalue"></span>
+          <span id="pawn3atktxt" class="atktxt">50 ATK</span>
+          <button id="pawn3atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
       </div>
-      <div id="pawn2attackblock" class="attackblock">
-        <button id="pawn2atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="pawn2atk" class="atkvalue"></span>
-        <span id="pawn2atktxt" class="atktxt">50 ATK</span>
-        <button id="pawn2atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+
+      <div class="piece-flex">
+        <div>
+          <button id="pawn4icon" class="piece-icon">♙</button>
+        </div>
+        <div><span class='piecename'>Pawn</span></div>
+        <div id="pawn4attackblock" class="attackblock">
+          <button id="pawn4atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="pawn4atk" class="atkvalue"></span>
+          <span id="pawn4atktxt" class="atktxt">50 ATK</span>
+          <button id="pawn4atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
+      </div>
+      <div class="piece-flex">
+        <p>After you place three pawns on the board, you can put down another unit.</p>
+      </div>
+      <div class="piece-flex">
+        <p>After you place three pawns on the board, you can put down another unit.</p>
       </div>
     </div>
 
-    <div class="piece-flex">
-      <div>
-        <button id="pawn3icon" class="piece-icon">♙</button>
+    <div class='piece-container'>
+      <div class="piece-flex">
+        <div>
+          <button id="pawn5icon" class="piece-icon">♙</button>
+        </div>
+        <div><span class='piecename'>Pawn</span></div>
+        <div id="pawn5attackblock" class="attackblock">
+          <button id="pawn5atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="pawn5atk" class="atkvalue"></span>
+          <span id="pawn5atktxt" class="atktxt">50 ATK</span>
+          <button id="pawn5atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
       </div>
-      <div id="pawn3attackblock" class="attackblock">
-        <button id="pawn3atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="pawn3atk" class="atkvalue"></span>
-        <span id="pawn3atktxt" class="atktxt">50 ATK</span>
-        <button id="pawn3atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+
+      <div class="piece-flex">
+        <div>
+          <button id="pawn6icon" class="piece-icon">♙</button>
+        </div>
+        <div><span class='piecename'>Pawn</span></div>
+        <div id="pawn6attackblock" class="attackblock">
+          <button id="pawn6atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="pawn6atk" class="atkvalue"></span>
+          <span id="pawn6atktxt" class="atktxt">50 ATK</span>
+          <button id="pawn6atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
+      </div>
+      <div class="piece-flex">
+        <p>After you place three pawns on the board, you can put down another unit.</p>
+      </div>
+      <div class="piece-flex">
+        <p>After you place three pawns on the board, you can put down another unit.</p>
       </div>
     </div>
 
-    <div class="piece-flex">
-      <div>
-        <button id="pawn4icon" class="piece-icon">♙</button>
+    <div class='piece-container'>
+      <div class="piece-flex">
+        <div>
+          <button id="pawn7icon" class="piece-icon">♙</button>
+        </div>
+        <div><span class='piecename'>Pawn</span></div>
+        <div id="pawn7attackblock" class="attackblock">
+          <button id="pawn7atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="pawn7atk" class="atkvalue"></span>
+          <span id="pawn7atktxt" class="atktxt">50 ATK</span>
+          <button id="pawn7atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
       </div>
-      <div id="pawn4attackblock" class="attackblock">
-        <button id="pawn4atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="pawn4atk" class="atkvalue"></span>
-        <span id="pawn4atktxt" class="atktxt">50 ATK</span>
-        <button id="pawn4atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+
+      <div class="piece-flex">
+        <div>
+          <button id="pawn8icon" class="piece-icon">♙</button>
+        </div>
+        <div><span class='piecename'>Pawn</span></div>
+        <div id="pawn8attackblock" class="attackblock">
+          <button id="pawn8atkinc" class="atkinc"><i class="arrow up"></i></button>
+          <span id="pawn8atk" class="atkvalue"></span>
+          <span id="pawn8atktxt" class="atktxt">50 ATK</span>
+          <button id="pawn8atkdecr" class="atkdecr"><i class="arrow down"></i></button>
+        </div>
+      </div>
+      <div class="piece-flex">
+        <p>After you place three pawns on the board, you can put down another unit.</p>
+      </div>
+      <div class="piece-flex">
+        <p>After you place three pawns on the board, you can put down another unit.</p>
       </div>
     </div>
   </div>
 
-  <div class="column">
-    <div class="piece-flex">
-      <div>
-        <button id="queenicon" class="piece-icon">♕</button>
-      </div>
-      <div id="queenattackblock" class="attackblock">
-        <button id="queenatkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="queenatk" class="atkvalue"></span>
-        <span id="queenatktxt" class="atktxt">150 ATK</span>
-        <button id="queenatkdecr" class="atkdecr"><i class="arrow down"></i></button>
-      </div>
-    </div>
-
-    <div class="piece-flex">
-      <div>
-        <button id="bishop2icon" class="piece-icon">♗</button>
-      </div>
-      <div id="bishop2attackblock" class="attackblock">
-        <button id="bishop2atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="bishop2atk" class="atkvalue"></span>
-        <span id="bishop2atktxt" class="atktxt">100 ATK</span>
-        <button id="bishop2atkdecr" class="atkdecr"><i class="arrow down"></i></button>
-      </div>
-    </div>
-
-    <div class="piece-flex">
-      <div>
-        <button id="knight2icon" class="piece-icon">♘</button>
-      </div>
-      <div id="knight2attackblock" class="attackblock">
-        <button id="knight2atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="knight2atk" class="atkvalue"></span>
-        <span id="knight2atktxt" class="atktxt">100 ATK</span>
-        <button id="knight2atkdecr" class="atkdecr"><i class="arrow down"></i></button>
-      </div>
-    </div>
-
-    <div class="piece-flex">
-      <div>
-        <button id="rook2icon" class="piece-icon">♖</button>
-      </div>
-      <div id="rook2attackblock" class="attackblock">
-        <button id="rook2atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="rook2atk" class="atkvalue"></span>
-        <span id="rook2atktxt" class="atktxt">150 ATK</span>
-        <button id="rook2atkdecr" class="atkdecr"><i class="arrow down"></i></button>
-      </div>
-    </div>
-
-    <div class="piece-flex">
-      <div>
-        <button id="pawn5icon" class="piece-icon">♙</button>
-      </div>
-      <div id="pawn5attackblock" class="attackblock">
-        <button id="pawn5atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="pawn5atk" class="atkvalue"></span>
-        <span id="pawn5atktxt" class="atktxt">50 ATK</span>
-        <button id="pawn5atkdecr" class="atkdecr"><i class="arrow down"></i></button>
-      </div>
-    </div>
-
-    <div class="piece-flex">
-      <div>
-        <button id="pawn6icon" class="piece-icon">♙</button>
-      </div>
-      <div id="pawn6attackblock" class="attackblock">
-        <button id="pawn6atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="pawn6atk" class="atkvalue"></span>
-        <span id="pawn6atktxt" class="atktxt">50 ATK</span>
-        <button id="pawn6atkdecr" class="atkdecr"><i class="arrow down"></i></button>
-      </div>
-    </div>
-
-    <div class="piece-flex">
-      <div>
-        <button id="pawn7icon" class="piece-icon">♙</button>
-      </div>
-      <div id="pawn7attackblock" class="attackblock">
-        <button id="pawn7atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="pawn7atk" class="atkvalue"></span>
-        <span id="pawn7atktxt" class="atktxt">50 ATK</span>
-        <button id="pawn7atkdecr" class="atkdecr"><i class="arrow down"></i></button>
-      </div>
-    </div>
-
-    <div class="piece-flex">
-      <div>
-        <button id="pawn8icon" class="piece-icon">♙</button>
-      </div>
-      <div id="pawn8attackblock" class="attackblock">
-        <button id="pawn8atkinc" class="atkinc"><i class="arrow up"></i></button>
-        <span id="pawn8atk" class="atkvalue"></span>
-        <span id="pawn8atktxt" class="atktxt">50 ATK</span>
-        <button id="pawn8atkdecr" class="atkdecr"><i class="arrow down"></i></button>
-      </div>
-    </div>
-  </div>
   <div id="totals">
     <span id="totalatk"></span>
     <span class="totaltxt"> Total ATK</span>
