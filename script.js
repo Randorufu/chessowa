@@ -1005,7 +1005,7 @@ function calculate() {
   totalatkval = 0;
 }
 
-const maxhealth = 20000;
+const maxhealth = 10000;
 var totalhealthval = maxhealth;
 var totalhealth = document.getElementById("totalhealth");
 totalhealth.innerHTML = totalhealthval;
