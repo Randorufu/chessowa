@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chessowa</title>
+    <style>
+        body {
+            background: #0b0b14;
+            color: #eee;
+            font-family: sans-serif;
+            text-align: center
+        }
+
+        #game {
+            display: grid;
+            grid-template-columns: 260px auto 260px;
+            gap: 10px;
+            padding: 10px
+        }
+
+        .panel {
+            background: #161622;
+            padding: 10px;
+            border-radius: 10px
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(8, 72px);
+            gap: 2px;
+            margin: auto
+        }
+
+        .cell {
+            width: 72px;
+            height: 72px;
+            background: #222;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            cursor: pointer
+        }
+
+        .cell.player {
+            color: #9fd3ff;
+        }
+
+        .cell.ai {
+            color: #ff9f9f;
+        }
+
+        .icon {
+            width: 72px;
+            height: 72px;
+        }
+        
+        .icon img {
+            width: 72px;
+            height: 72px;
+        }
+
+        .atk {
+            font-size: 13px;
+            padding: 0;
+            margin: 0;
+            z-index: +1;
+            margin-top: -16px;
+            font-weight: bold;
+        }
+
+        button {
+            background: #222;
+            color: #eee;
+            border: 1px solid #444;
+            padding: 6px;
+            margin: 3px;
+            border-radius: 6px;
+        }
+
+        .selected {
+            outline: 2px solid gold;
+        }
+
+        .damage-popup {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.6);
+            font-size: 64px;
+            font-weight: bold;
+            color: #ff4444;
+            opacity: 0;
+            transition: all .4s ease;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        .damage-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -70%) scale(1);
+        }
+
+        #modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #modal div {
+            background: #161622;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .graveyard span {
+            font-size: 20px;
+            margin: 2px;
+        }
+
+        .popup {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            animation: fadeUp .9s ease forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 1;
+                transform: translate(-50%, -50%)
+            }
+
+            to {
+                opacity: 0;
+                transform: translate(-50%, -80%)
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    <h1>♟ Chessowa</h1>
+
+    <div id="game">
+        <div class="panel" id="playerPanel">
+            <div id="playerStatus"></div>
+            <div id="playerHand"></div>
+            <div id="playerGraveyard"></div>
+        </div>
+
+        <div id="board"></div>
+
+        <div class="panel" id="aiPanel">
+            <div id="aiStatus"></div>
+            <div id="aiHand"></div>
+            <div id="aiGraveyard"></div>
+        </div>
+    </div>
+
+    <div class="panel" id="spells"></div>
+    <button onclick="endTurn()">End Turn</button>
+
+    <div id="modal">
+        <div>
+            <p>King Ability</p>
+            <button onclick="resolveKingChoice('damage')">Deal 200 Damage</button>
+            <button onclick="resolveKing('mp')">Reduce Enemy MP by 2</button>
+        </div>
+    </div>
+
+    <script>
+        /* ================= CONSTANTS ================= */
+        const ICON = {
+            player: {
+                king: "♔",
+                queen: "♕",
+                rook: "♖",
+                bishop: "♗",
+                knight: "♘",
+                pawn: "♙"
+            },
+            ai: {
+                king: "♚",
+                queen: "♛",
+                rook: "♜",
+                bishop: "♝",
+                knight: "♞",
+                pawn: "♟"
+            }
+        };
+
+        const PIECE_IMAGES = {
+            player: {
+                pawn: [
+                    "images/player/pawn-1.png",
+                    "images/player/pawn-2.png",
+                    "images/player/pawn-3.png",
+                    "images/player/pawn-4.png",
+                    "images/player/pawn-5.png",
+                    "images/player/pawn-6.png",
+                    "images/player/pawn-7.png",
+                    "images/player/pawn-8.png"
+                ],
+                rook: [
+                    "images/player/rook-1.png",
+                    "images/player/rook-2.png"
+                ],
+                bishop: [
+                    "images/player/bishop-1.png",
+                    "images/player/bishop-2.png"
+                ],
+                knight: [
+                    "images/player/knight-1.png",
+                    "images/player/knight-2.png"
+                ],
+                queen: ["images/player/queen-1.png"],
+                king: ["images/player/king-1.png"]
+            },
+            ai: {
+                pawn: [
+                    "images/ai/pawn-1.png",
+                    "images/ai/pawn-2.png",
+                    "images/ai/pawn-3.png",
+                    "images/ai/pawn-4.png",
+                    "images/ai/pawn-5.png",
+                    "images/ai/pawn-6.png",
+                    "images/ai/pawn-7.png",
+                    "images/ai/pawn-8.png"
+                ],
+                rook: [
+                    "images/ai/rook-1.png",
+                    "images/ai/rook-2.png"
+                ],
+                bishop: [
+                    "images/ai/bishop-1.png",
+                    "images/ai/bishop-2.png"
+                ],
+                knight: [
+                    "images/ai/knight-1.png",
+                    "images/ai/knight-2.png"
+                ],
+                queen: ["images/ai/queen-1.png"],
+                king: ["images/ai/king-1.png"]
+            }
+        };
+
+        const BASE = {
+            king: 200,
+            queen: 150,
+            rook: 150,
+            bishop: 100,
+            knight: 100,
+            pawn: 50
+        };
+        const inB = (r, c) => r >= 0 && c >= 0 && r < 8 && c < 8;
+        const adj = (r, c) => [
+            [r - 1, c],
+            [r + 1, c],
+            [r, c - 1],
+            [r, c + 1]
+        ].filter(x => inB(x[0], x[1]));
+
+        /* ================= STATE ================= */
+        let G = {
+            turn: "player",
+            board: [...Array(8)].map(() => Array(8).fill(null)),
+            player: {
+                hp: 10000,
+                mp: 0,
+                hand: [],
+                deck: [],
+                dead: [],
+                pawn: 0,
+                lastSpell: ""
+            },
+            ai: {
+                hp: 10000,
+                mp: 0,
+                hand: [],
+                deck: [],
+                dead: [],
+                pawn: 0,
+                lastSpell: "",
+                nextSpell: null
+            },
+            ids: {
+                player: {},
+                ai: {}
+            },
+            placements: 1,
+            spellUsed: false,
+            kingPending: null,
+            gameOver: false
+        };
+
+        function uid(o, t) {
+            G.ids[o][t] = (G.ids[o][t] || 0) + 1;
+            return `${o}-${t}-${G.ids[o][t]}`
+        }
+
+        let reviveQueue = [];
+
+        /* ================= SETUP ================= */
+        function makeDeck(o) {
+            let d = [{
+                type: "king"
+            }, {
+                type: "queen"
+            }];
+            ["rook", "bishop", "knight"].forEach(p => {
+                d.push({
+                    type: p
+                }, {
+                    type: p
+                })
+            });
+            for (let i = 0; i < 8; i++) d.push({
+                type: "pawn"
+            });
+            d.forEach(x => x.owner = o);
+            return d;
+        }
+        G.player.deck = makeDeck("player");
+        G.ai.deck = makeDeck("ai");
+
+        function draw(player) {
+            if (player.deck.length === 0) return; // no cards left
+            const idx = Math.floor(Math.random() * player.deck.length);
+            const card = player.deck.splice(idx, 1)[0];
+            player.hand.push(card);
+        }
+
+        function drawUntil(p, min = 3) {
+            while (p.hand.length < min && p.deck.length) {
+                p.hand.push(p.deck.splice(Math.random() * p.deck.length | 0, 1)[0]);
+            }
+        }
+
+        function canCastSpell(caster, spellName) {
+            const s = SPELLS[spellName];
+            if (!s) return false;
+            if (caster.mp < s.cost) return false;
+
+            // Special restrictions
+            if (spellName === "haste1" && caster.hand.length === 0) return false;
+            if (spellName === "haste2" && caster.hand.length < 2) return false;
+            if (spellName === "life1" && caster.dead.length < 1) return false;
+            if (spellName === "life2" && caster.dead.length < 2) return false;
+
+            return true;
+        }
+
+        function selectRevive(owner, index) {
+            if (G.turn !== "player") return;
+            if (!reviveQueue.length) return;
+
+            const p = G.player.dead.splice(index, 1)[0];
+            G.player.hand.push(p);
+            reviveQueue.pop();
+
+            if (!reviveQueue.length) {
+                render();
+            }
+        }
+
+        /* ================= HELPERS ================= */
+        const ortho = (r, c) => [
+            r > 0 ? [r - 1, c] : null,
+            r < 7 ? [r + 1, c] : null,
+            c > 0 ? [r, c - 1] : null,
+            c < 7 ? [r, c + 1] : null
+        ];
+
+        function wouldSurroundEnemy(r, c, owner) {
+            const enemy = owner === "player" ? "ai" : "player";
+            const kills = [];
+
+            adj(r, c).forEach(([rr, cc]) => {
+                const p = G.board[rr][cc];
+                if (!p || p.owner !== enemy) return;
+
+                const fullySurrounded = adj(rr, cc).every(([sr, sc]) => {
+                    if (sr === r && sc === c) return true; // pretend we're placing here
+                    const cell = G.board[sr][sc];
+                    return cell && cell.owner === owner;
+                });
+
+                if (fullySurrounded) kills.push([rr, cc]);
+            });
+
+            return kills.length;
+        }
+
+        function countEnemyAdj(r, c, owner) {
+            return adj(r, c).filter(([rr, cc]) => {
+                const p = G.board[rr][cc];
+                return p && p.owner !== owner;
+            }).length;
+        }
+
+        function emptyAdj(r, c) {
+            return adj(r, c).filter(([rr, cc]) => !G.board[rr][cc]);
+        }
+
+        // Is this piece about to be surrounded next turn?
+        function dangerEscapeSquares(r, c, owner) {
+            const enemies = countEnemyAdj(r, c, owner);
+            if (enemies < 3) return [];
+            return emptyAdj(r, c);
+        }
+
+        function findDefenseMoves(owner) {
+            const moves = [];
+
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const p = G.board[r][c];
+                    if (!p || p.owner !== owner) continue;
+
+                    const escapes = dangerEscapeSquares(r, c, owner);
+                    escapes.forEach(([er, ec]) => {
+                        moves.push({
+                            r: er,
+                            c: ec,
+                            protect: true,
+                            score: 2000
+                        });
+                    });
+                }
+            }
+
+            return moves;
+        }
+
+        /* ================= ABILITIES ================= */
+        function applyAbility(p, r, c) {
+            let me = p.owner === "player" ? G.player : G.ai;
+            let op = p.owner === "player" ? G.ai : G.player;
+
+            if (p.type === "queen") {
+                me.mp = Math.min(7, me.mp + 1);
+                ortho(r, c).forEach(a => {
+                    if (a) {
+                        let q = G.board[a[0]][a[1]];
+                        if (q) q.atk -= 50;
+                    }
+                });
+            }
+
+            if (p.type === "bishop") {
+                adj(r, c).forEach(([rr, cc]) => {
+                    const q = G.board[rr][cc];
+                    if (q && q.owner === p.owner) q.atk += 50;
+                });
+            }
+
+            if (p.type === "knight") {
+                let targets = [];
+                ortho(r, c).forEach(a => {
+                    if (a) {
+                        let q = G.board[a[0]][a[1]];
+                        if (q && q.owner !== p.owner) targets.push(a);
+                    }
+                });
+                if (targets.length) {
+                    let [tr, tc] = targets[Math.random() * targets.length | 0];
+                    let killed = G.board[tr][tc];
+                    G.board[tr][tc] = null;
+                    op.dead.push(killed);
+                }
+            }
+        }
+
+        function resolveKingChoice(choice) {
+            if (choice === "damage") {
+                G.ai.hp -= 200;
+                popup("-200");
+            } else {
+                G.ai.mp = Math.max(0, G.ai.mp - 2);
+                popup("-2 MP", "purple");
+            }
+            modal.style.display = "none";
+            G.kingPending = null;
+
+            // Clear selection so you can pick a new card
+            sel = null;
+
+            resolveSurround();
+            render();
+        }
+
+        /* ================= SURROUND (MULTI-REMOVE SAFE) ================= */
+        // Check only enemy pieces around a new placement
+        function resolveSurroundAt(r, c, owner) {
+            const enemy = owner === "player" ? "ai" : "player";
+            const toRemove = [];
+
+            adj(r, c).forEach(([rr, cc]) => {
+                const p = G.board[rr][cc];
+                if (!p || p.owner !== enemy) return;
+
+                // Check if this enemy piece is fully surrounded by the current owner
+                const surrounding = adj(rr, cc);
+                const fullySurrounded = surrounding.every(([sr, sc]) => {
+                    const cell = G.board[sr][sc];
+                    return cell && cell.owner === owner; // only count the placing player
+                });
+
+                if (fullySurrounded) toRemove.push([rr, cc, p]);
+            });
+
+            // Remove fully surrounded enemy pieces
+            toRemove.forEach(([rr, cc, p]) => {
+                G.board[rr][cc] = null;
+                (p.owner === "player" ? G.player : G.ai).dead.push(p);
+                popup(`Surrounded: ${ICON[p.owner][p.type]}`, "yellow");
+            });
+        }
+
+        function surroundScore(r, c, owner) {
+            const enemy = owner === "player" ? "ai" : "player";
+            let score = 0;
+
+            adj(r, c).forEach(([rr, cc]) => {
+                const p = G.board[rr][cc];
+                if (!p || p.owner !== enemy) return;
+
+                const friendlyAround = adj(rr, cc).filter(([r2, c2]) => {
+                    const q = G.board[r2][c2];
+                    return q && q.owner === owner;
+                }).length;
+
+                // Strongly reward getting close to a full surround
+                if (friendlyAround === 3) score += 100; // next move kills
+                else if (friendlyAround === 2) score += 30;
+                else if (friendlyAround === 1) score += 10;
+            });
+
+            return score;
+        }
+
+        function enemyProximity(r, c, owner) {
+            const enemy = owner === "player" ? "ai" : "player";
+            let best = Infinity;
+
+            for (let rr = 0; rr < 8; rr++) {
+                for (let cc = 0; cc < 8; cc++) {
+                    const p = G.board[rr][cc];
+                    if (p && p.owner === enemy) {
+                        const d = Math.abs(rr - r) + Math.abs(cc - c);
+                        best = Math.min(best, d);
+                    }
+                }
+            }
+
+            return best === Infinity ? 0 : Math.max(0, 6 - best);
+        }
+
+        /* ================= POPUP ================= */
+        function showDamage(amount, cb) {
+            let d = document.createElement("div");
+            d.className = "damage-popup";
+            d.textContent = "⚔️ " + amount;
+            document.body.appendChild(d);
+            requestAnimationFrame(() => d.classList.add("show"));
+            setTimeout(() => {
+                d.remove();
+                cb && cb();
+            }, 900);
+        }
+
+        function popup(text, color = "red") {
+            const d = document.createElement("div");
+            d.className = "popup";
+            d.style.color = color;
+            d.textContent = text;
+            document.body.appendChild(d);
+            setTimeout(() => d.remove(), 900);
+        }
+
+        /* ================= SPELLS ================= */
+        const SPELLS = {
+            flare: {
+                cost: 2,
+                dmg: 200
+            },
+            ultima: {
+                cost: 4,
+                dmg: 400
+            },
+            requiem: {
+                cost: 7,
+                dmg: 800
+            },
+            life1: {
+                cost: 3,
+                revive: 1
+            },
+            life2: {
+                cost: 5,
+                revive: 2
+            },
+            haste1: {
+                cost: 2,
+                draw: 1
+            },
+            haste2: {
+                cost: 4,
+                draw: 2
+            },
+            dispel: {
+                cost: 3
+            },
+            break: {
+                cost: 6
+            }
+        };
+
+        function revive(owner, n) {
+            let side = owner === "player" ? G.player : G.ai;
+            while (n-- && side.dead.length) side.hand.push(side.dead.pop());
+        }
+
+        function dispel(breakAtk) {
+            G.board.flat().forEach(p => {
+                if (p) p.atk = breakAtk ? 0 : BASE[p.type]
+            });
+        }
+
+        function castSpell(caster, target, name) {
+            if (!canCastSpell(caster, name) || G.spellUsed) return;
+
+            const s = SPELLS[name];
+            caster.mp -= s.cost;
+            G.spellUsed = true;
+            caster.lastSpell = name;
+
+            if (s.dmg) {
+                target.hp -= s.dmg;
+                popup("-" + s.dmg, "orange");
+            }
+
+            if (s.revive) {
+                if (caster === G.player) {
+                    reviveQueue = Array(s.revive).fill(true);
+                    alert("Select pieces from your graveyard to revive");
+                    return;
+                } else {
+                    for (let i = 0; i < s.revive; i++) {
+                        const g = caster.dead.pop();
+                        if (g) caster.hand.push(g);
+                    }
+                }
+            }
+
+            if (s.draw) {
+                for (let i = 0; i < s.draw; i++) draw(caster);
+            }
+
+            if (name === "dispel" || name === "break") {
+                G.board.flat().forEach(p => {
+                    if (p) p.atk = name === "break" ? 0 : BASE[p.type];
+                });
+            }
+
+            render();
+        }
+
+        /* ================= TURN FLOW ================= */
+        function startTurn(o) {
+            G.turn = o;
+            G.placements = 1;
+            G.spellUsed = false;
+            sel = null;
+
+            G.board.flat().forEach(p => {
+                if (p && p.owner === o && p.type === "rook") p.atk += 50;
+            });
+        }
+
+        let sel = null;
+
+        function placePiece(owner, card, r, c) {
+            if (owner === "player" && G.placements <= 0) return;
+            if (G.gameOver || G.board[r][c]) return;
+
+            const id = uid(owner, card.type);
+            const pool = PIECE_IMAGES[owner][card.type];
+            const img = pool.shift(); // permanently consume one image
+
+            const piece = {
+                id,
+                owner,
+                type: card.type,
+                atk: BASE[card.type],
+                img // 🔥 per-instance image
+            };
+
+            G.board[r][c] = piece;
+
+            // REMOVE the card from hand
+            if (owner === "player") {
+                const index = G.player.hand.indexOf(card);
+                if (index !== -1) G.player.hand.splice(index, 1);
+            } else {
+                const index = G.ai.hand.indexOf(card);
+                if (index !== -1) G.ai.hand.splice(index, 1);
+            }
+
+            // Gain MP
+            const playerObj = owner === "player" ? G.player : G.ai;
+            playerObj.mp = Math.min(7, playerObj.mp + 1);
+
+            // Pawn bonus
+            if (card.type === "pawn") {
+                playerObj.pawn++;
+                if (owner === "player" && playerObj.pawn % 3 === 0) {
+                    G.placements += 1; // extra placement
+                }
+            }
+
+            // King ability
+            if (owner === "player" && card.type === "king") {
+                G.kingPending = {
+                    piece,
+                    r,
+                    c
+                };
+                modal.style.display = "flex";
+                render();
+                return;
+            }
+
+            applyAbility(piece, r, c);
+
+            // Surround enemies
+            resolveSurroundAt(r, c, owner);
+
+            // Decrease placements for player
+            if (owner === "player") {
+                G.placements--;
+                if (G.placements <= 0) sel = null; // clear selection if no placements left
+            }
+
+            render();
+        }
+
+        function endTurn() {
+            let dmg = G.board.flat().reduce((s, p) => p && p.owner === "player" ? s + p.atk : s, 0);
+            showDamage(dmg, () => {
+                G.ai.hp -= dmg;
+                if (checkWin()) return;
+                aiTurn();
+            });
+        }
+
+        function checkWin() {
+            if (G.player.hp <= 0 && G.ai.hp <= 0) {
+                alert("Draw!");
+                location.reload();
+                return true;
+            }
+            if (G.player.hp <= 0) {
+                alert("AI Wins!");
+                location.reload();
+                return true;
+            }
+            if (G.ai.hp <= 0) {
+                alert("Player Wins!");
+                location.reload();
+                return true;
+            }
+            return false;
+        }
+
+        /* ================= AI TURN ================= */
+        function aiFirstMove() {
+            drawUntil(G.ai, 3);
+
+            // Get all empty cells and shuffle them for unpredictability
+            let empties = [];
+            for (let r = 0; r < 8; r++)
+                for (let c = 0; c < 8; c++)
+                    if (!G.board[r][c]) empties.push([r, c]);
+            empties = shuffle(empties);
+
+            if (!G.ai.hand.length || !empties.length) return;
+
+            // Pick best spot based on surroundScore, fallback to random
+            let best = empties[0],
+                bestScore = -1;
+            empties.forEach(([r, c]) => {
+                const score = surroundScore(r, c, "ai"); // use AI as the placing owner
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = [r, c];
+                }
+            });
+
+            const [r, c] = best;
+
+            // Place first card
+            const card = G.ai.hand.shift();
+            const piece = {
+                id: uid("ai", card.type),
+                owner: "ai",
+                type: card.type,
+                atk: BASE[card.type]
+            };
+            G.board[r][c] = piece;
+
+            applyAbility(piece, r, c);
+            resolveSurroundAt(r, c, piece.owner);
+
+            render();
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function aiPlacementScore(r, c, owner) {
+            const baseScore = surroundScore(r, c, owner); // how many enemy pieces it would surround
+            const centerWeight = 4 - Math.abs(3.5 - r) - Math.abs(3.5 - c); // max ~4 at center
+            return baseScore + centerWeight * 0.5; // blend center preference
+        }
+
+
+        /* ================= AI TURN ================= */
+        function aiTurn() {
+            startTurn("ai");
+            drawUntil(G.ai, 3);
+
+            if (!G.ai.nextSpell) aiChooseSpell();
+
+            /* ================= COLLECT EMPTY CELLS ================= */
+            const empties = [];
+            for (let r = 0; r < 8; r++)
+                for (let c = 0; c < 8; c++)
+                    if (!G.board[r][c]) empties.push([r, c]);
+
+            if (!G.ai.hand.length || !empties.length) return;
+
+            let candidateMoves = [];
+
+
+            /* ================= ⚔️ 2. IMMEDIATE KILLS ================= */
+            if (!candidateMoves.length) {
+                empties.forEach(([r, c]) => {
+                    const kills = wouldSurroundEnemy(r, c, "ai");
+                    if (kills > 0) {
+                        candidateMoves.push({
+                            r,
+                            c,
+                            score: 2000 + kills * 200,
+                            reason: "kill"
+                        });
+                    }
+                });
+            }
+
+            /* ================= 🎯 3. SURROUND SETUP ================= */
+            if (!candidateMoves.length) {
+                let bestScore = -Infinity;
+
+                empties.forEach(([r, c]) => {
+                    const score =
+                        surroundScore(r, c, "ai") * 5 +
+                        enemyProximity(r, c, "ai") * 3;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        candidateMoves = [{
+                            r,
+                            c,
+                            score,
+                            reason: "setup"
+                        }];
+                    } else if (score === bestScore) {
+                        candidateMoves.push({
+                            r,
+                            c,
+                            score,
+                            reason: "setup"
+                        });
+                    } // If bestScore is 0, still allow setup — we will refine with proximity
+                });
+            }
+
+            /* ================= 🎲 4. PURE RANDOM FALLBACK ================= */
+            if (!candidateMoves.length) {
+                const [r, c] = empties[Math.floor(Math.random() * empties.length)];
+                candidateMoves = [{
+                    r,
+                    c,
+                    reason: "random"
+                }];
+            }
+
+            /* ================= 🛡️ 1. ANTI-SURROUND DEFENSE (NEW) ================= */
+            if (!candidateMoves.length) {
+                empties.forEach(([r, c]) => {
+                    adj(r, c).forEach(([rr, cc]) => {
+                        const p = G.board[rr][cc];
+                        if (!p || p.owner !== "ai") return;
+
+                        const enemyCount = countEnemyAdj(rr, cc, "ai");
+                        const emptyCount = emptyAdj(rr, cc).length;
+
+                        if (enemyCount === 3 && emptyCount === 1) {
+                            candidateMoves.push({
+                                r,
+                                c,
+                                reason: "defense"
+                            });
+                        }
+                    });
+                });
+            }
+
+            /* ================= EXECUTE MOVE ================= */
+            const move = candidateMoves[Math.floor(Math.random() * candidateMoves.length)];
+
+            const cardIndex = Math.floor(Math.random() * G.ai.hand.length);
+            const card = G.ai.hand[cardIndex];
+
+            placePiece("ai", card, move.r, move.c);
+
+            /* ================= SPELL PHASE ================= */
+            aiCastSpell();
+
+            /* ================= DAMAGE PHASE ================= */
+            const dmg = G.board.flat().reduce(
+                (s, p) => (p && p.owner === "ai" ? s + p.atk : s),
+                0
+            );
+
+            showDamage(dmg, () => {
+                G.player.hp -= dmg;
+                if (checkWin()) return;
+                startTurn("player");
+                drawUntil(G.player, 3);
+                render();
+            });
+        }
+
+
+
+        /* ================= AI SPELL LOGIC ================= */
+        function aiChooseSpell() {
+            // Pick a random spell to "plan" — exclude life1/life2
+            const candidateSpells = ["flare", "ultima", "requiem", "dispel", "break"];
+            G.ai.nextSpell = candidateSpells[Math.floor(Math.random() * candidateSpells.length)];
+        }
+
+        function aiCastSpell() {
+            if (G.spellUsed) return;
+
+            // Ensure AI has a planned spell
+            if (!G.ai.nextSpell) aiChooseSpell();
+
+            let spellToCast = G.ai.nextSpell;
+
+            // 33% chance to override with life spell if there are dead AI pieces
+            const rand = Math.random();
+            if (G.ai.dead.length >= 2 && rand < 0.33 && canCastSpell(G.ai, "life2")) {
+                spellToCast = "life2";
+            } else if (G.ai.dead.length === 1 && rand < 0.33 && canCastSpell(G.ai, "life1")) {
+                spellToCast = "life1";
+            }
+
+            // Only cast if possible; if not, keep planned spell for future turns
+            if (canCastSpell(G.ai, spellToCast)) {
+                castSpell(G.ai, G.player, spellToCast);
+
+                // If it was a normal planned spell, reset nextSpell for new random pick next turn
+                if (spellToCast !== "life1" && spellToCast !== "life2") {
+                    G.ai.nextSpell = null;
+                }
+            }
+        }
+
+        /* ================= RENDER ================= */
+        function render() {
+            // ===== PLAYER STATUS =====
+            playerStatus.innerHTML = `
+    <b>Player</b><br>
+    HP: ${G.player.hp} MP: ${G.player.mp}<br>
+    Placements: ${G.placements}<br>
+    Last Spell: ${G.player.lastSpell || "None"}
+  `;
+
+            // ===== PLAYER HAND =====
+            playerHand.innerHTML = "<b>Your Hand</b><br>";
+            G.player.hand.forEach((p, i) => {
+                let b = document.createElement("button");
+                b.textContent = ICON.player[p.type] + " " + p.type;
+                b.innerHTML = `
+  <img src="${p.img}" style="width:24px;height:24px;vertical-align:middle">
+  ${p.type}
+`;
+                if (i === sel) b.classList.add("selected");
+                b.onclick = () => {
+                    if (G.turn !== "player") return;
+                    if (G.placements <= 0) return;
+                    sel = i;
+                    render();
+                };
+                playerHand.appendChild(b);
+            });
+
+            // ===== PLAYER GRAVEYARD =====
+            playerGraveyard.innerHTML = "<b>Graveyard</b><br>";
+            G.player.dead.forEach((p, i) => {
+                const span = document.createElement("span");
+                span.textContent = ICON.player[p.type];
+                span.innerHTML = `
+  <img src="${p.img}" style="width:20px;height:20px">
+`;
+                span.onclick = () => selectRevive('player', i);
+                playerGraveyard.appendChild(span);
+            });
+
+            // ===== AI STATUS =====
+            aiStatus.innerHTML = `
+    <b>AI</b><br>
+    HP: ${G.ai.hp} MP: ${G.ai.mp}<br>
+    Last Spell: ${G.ai.lastSpell || "None"}
+  `;
+
+            // ===== AI HAND =====
+            aiHand.innerHTML = "<b>AI Hand</b><br>";
+            G.ai.hand.forEach((p, i) => {
+                const b = document.createElement("button");
+                b.textContent = ICON.ai[p.type] + " " + p.type;
+                b.innerHTML = `
+  <img src="${p.img}" style="width:24px;height:24px;vertical-align:middle;opacity:0.7">
+  ${p.type}
+`;
+                b.disabled = true; // AI hand cards are not selectable
+                b.style.opacity = 0.6; // Slightly faded to indicate AI ownership
+                aiHand.appendChild(b);
+            });
+
+            // ===== AI GRAVEYARD =====
+            aiGraveyard.innerHTML = "<b>Graveyard</b><br>";
+            G.ai.dead.forEach(p => {
+                const span = document.createElement("span");
+                span.textContent = ICON.ai[p.type];
+                aiGraveyard.appendChild(span);
+                span.innerHTML = `
+  <img src="${p.img}" style="width:20px;height:20px">
+`;
+            });
+
+            // ===== BOARD =====
+            board.innerHTML = "";
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    let d = document.createElement("div");
+                    d.className = "cell";
+                    let p = G.board[r][c];
+                    if (p) {
+                        d.classList.add(p.owner);
+                        d.innerHTML = `
+  <div class="icon">
+    <img src="${p.img}" alt="${p.type}">
+  </div>
+  <div class="atk">${p.atk}</div>
+`;
+                    }
+
+                    d.onclick = () => {
+                        if (G.turn !== "player") return;
+                        if (sel === null) return;
+                        if (G.placements <= 0) return;
+                        const card = G.player.hand[sel];
+                        if (!card) return;
+
+                        placePiece("player", card, r, c);
+
+                        sel = null;
+                        render();
+                    };
+
+                    board.appendChild(d);
+                }
+            }
+
+            // ===== SPELLS =====
+            spells.innerHTML = "<b>Spells</b><br>";
+            Object.keys(SPELLS).forEach(name => {
+                const s = SPELLS[name];
+                const b = document.createElement("button");
+                b.textContent = `${name.toUpperCase()} (${s.cost} MP)`;
+                b.onclick = () => {
+                    if (G.turn !== "player") return;
+                    castSpell(G.player, G.ai, name);
+                };
+
+                if (!canCastSpell(G.player, name) || G.spellUsed) {
+                    b.disabled = true;
+                    b.style.opacity = 0.4;
+                }
+
+                spells.appendChild(b);
+            });
+        }
+
+        // Decide who starts
+        const first = Math.random() < 0.5 ? "player" : "ai";
+
+        // Draw initial hands for both players
+        drawUntil(G.player, 3);
+        drawUntil(G.ai, 3);
+
+        // Start first turn
+        startTurn(first);
+
+        // If AI goes first, do its first move automatically
+        if (first === "ai") {
+            // Place AI's first piece
+            aiTurn(); // aiTurn now handles placement, abilities, spellcasting, and damage
+        }
+
+        // Render everything
+        render();
+
+    </script>
+
+</body>
+
+</html>
