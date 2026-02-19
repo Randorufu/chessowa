@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Chessowa</title>
+    <title>Chess'owa</title>
     <style>
         body {
             background: #0b0b14;
@@ -55,7 +55,7 @@
             width: 72px;
             height: 72px;
         }
-        
+
         .icon img {
             width: 72px;
             height: 72px;
@@ -109,6 +109,7 @@
             display: none;
             align-items: center;
             justify-content: center;
+            z-index: +1;
         }
 
         #modal div {
@@ -149,7 +150,7 @@
 </head>
 
 <body>
-    <h1>♟ Chessowa</h1>
+    <h1>Chess'owa</h1>
 
     <div id="game">
         <div class="panel" id="playerPanel">
@@ -174,7 +175,7 @@
         <div>
             <p>King Ability</p>
             <button onclick="resolveKingChoice('damage')">Deal 200 Damage</button>
-            <button onclick="resolveKing('mp')">Reduce Enemy MP by 2</button>
+            <button onclick="resolveKingChoice('mp')">Reduce Enemy MP by 2</button>
         </div>
     </div>
 
@@ -198,6 +199,8 @@
                 pawn: "♟"
             }
         };
+
+        const modal = document.getElementById("modal");
 
         const PIECE_IMAGES = {
             player: {
@@ -310,6 +313,9 @@
 
         let reviveQueue = [];
 
+        let lastPlacedR = null;
+        let lastPlacedC = null;
+
         /* ================= SETUP ================= */
         function makeDeck(o) {
             let d = [{
@@ -334,15 +340,23 @@
         G.ai.deck = makeDeck("ai");
 
         function draw(player) {
-            if (player.deck.length === 0) return; // no cards left
+            if (player.deck.length === 0) return;
+
             const idx = Math.floor(Math.random() * player.deck.length);
             const card = player.deck.splice(idx, 1)[0];
+
+            card.img = assignPieceImage(card.owner, card.type); // ⭐ key fix
+            card.id = uid(card.owner, card.type);
+
             player.hand.push(card);
         }
 
         function drawUntil(p, min = 3) {
             while (p.hand.length < min && p.deck.length) {
-                p.hand.push(p.deck.splice(Math.random() * p.deck.length | 0, 1)[0]);
+                const card = p.deck.splice(Math.random() * p.deck.length | 0, 1)[0];
+                card.img = assignPieceImage(card.owner, card.type);
+                card.id = uid(card.owner, card.type);
+                p.hand.push(card);
             }
         }
 
@@ -382,23 +396,37 @@
         ];
 
         function wouldSurroundEnemy(r, c, owner) {
+            if (G.board[r][c]) return 0;
+
             const enemy = owner === "player" ? "ai" : "player";
-            const kills = [];
+
+            // 1️⃣ simulate placement
+            G.board[r][c] = {
+                owner
+            };
+
+            let captured = 0;
+            const checked = new Set();
 
             adj(r, c).forEach(([rr, cc]) => {
                 const p = G.board[rr][cc];
                 if (!p || p.owner !== enemy) return;
 
-                const fullySurrounded = adj(rr, cc).every(([sr, sc]) => {
-                    if (sr === r && sc === c) return true; // pretend we're placing here
-                    const cell = G.board[sr][sc];
-                    return cell && cell.owner === owner;
-                });
+                const key = rr + "," + cc;
+                if (checked.has(key)) return;
 
-                if (fullySurrounded) kills.push([rr, cc]);
+                const group = getGroup(rr, cc, enemy);
+                group.forEach(([gr, gc]) => checked.add(gr + "," + gc));
+
+                if (!groupHasLiberty(group)) {
+                    captured += group.length;
+                }
             });
 
-            return kills.length;
+            // 2️⃣ undo simulation
+            G.board[r][c] = null;
+
+            return captured;
         }
 
         function countEnemyAdj(r, c, owner) {
@@ -442,6 +470,46 @@
             return moves;
         }
 
+        function countLiberties(group) {
+            const libs = new Set();
+
+            group.forEach(([r, c]) => {
+                adj(r, c).forEach(([rr, cc]) => {
+                    if (!G.board[rr][cc]) libs.add(rr + "," + cc);
+                });
+            });
+
+            return libs.size;
+        }
+
+        function assignPieceImage(owner, type) {
+            const pool = PIECE_IMAGES[owner][type];
+            if (!pool || !pool.length) return "";
+            return pool.shift();
+        }
+
+        function resolveSurroundForPlacement(owner, r, c) {
+            const enemy = owner === "player" ? "ai" : "player";
+            const kills = [];
+
+            adj(r, c).forEach(([rr, cc]) => {
+                const p = G.board[rr][cc];
+                if (!p || p.owner !== enemy) return;
+
+                const surrounded = adj(rr, cc).every(([r2, c2]) => {
+                    const q = G.board[r2][c2];
+                    return q && q.owner === owner; // only enemy counts
+                });
+
+                if (surrounded) kills.push([rr, cc, p]);
+            });
+
+            kills.forEach(([rr, cc, p]) => {
+                G.board[rr][cc] = null;
+                (p.owner === "player" ? G.player : G.ai).dead.push(p);
+            });
+        }
+
         /* ================= ABILITIES ================= */
         function applyAbility(p, r, c) {
             let me = p.owner === "player" ? G.player : G.ai;
@@ -481,6 +549,23 @@
             }
         }
 
+        function applyAuraFromNeighbors(piece, r, c) {
+            adj(r, c).forEach(([rr, cc]) => {
+                const neighbor = G.board[rr][cc];
+                if (!neighbor) return;
+
+                // Bishop aura (friendly buff)
+                if (neighbor.type === "bishop" && neighbor.owner === piece.owner) {
+                    piece.atk += 50;
+                }
+
+                // Queen aura (enemy debuff)
+                if (neighbor.type === "queen") {
+                    piece.atk -= 50;
+                }
+            });
+        }
+
         function resolveKingChoice(choice) {
             if (choice === "damage") {
                 G.ai.hp -= 200;
@@ -492,8 +577,8 @@
             modal.style.display = "none";
             G.kingPending = null;
 
-            // Clear selection so you can pick a new card
-            sel = null;
+            // ⭐ FINALIZE placement flow
+            resolveSurroundForPlacement("player", lastPlacedR, lastPlacedC);
 
             resolveSurround();
             render();
@@ -501,50 +586,117 @@
 
         /* ================= SURROUND (MULTI-REMOVE SAFE) ================= */
         // Check only enemy pieces around a new placement
+        /* ================= GO STYLE SURROUND ================= */
+        function getGroup(r, c, owner) {
+            const visited = new Set();
+            const stack = [
+                [r, c]
+            ];
+            const group = [];
+
+            while (stack.length) {
+                const [rr, cc] = stack.pop();
+                const key = rr + "," + cc;
+                if (visited.has(key)) continue;
+                visited.add(key);
+
+                const p = G.board[rr][cc];
+                if (!p || p.owner !== owner) continue;
+
+                group.push([rr, cc]);
+
+                adj(rr, cc).forEach(([nr, nc]) => {
+                    const np = G.board[nr][nc];
+                    if (np && np.owner === owner) stack.push([nr, nc]);
+                });
+            }
+
+            return group;
+        }
+
+        function groupHasLiberty(group) {
+            return group.some(([r, c]) =>
+                adj(r, c).some(([nr, nc]) => !G.board[nr][nc])
+            );
+        }
+
         function resolveSurroundAt(r, c, owner) {
             const enemy = owner === "player" ? "ai" : "player";
-            const toRemove = [];
 
+            let enemyCaptured = false;
+            const checked = new Set();
+
+            // 1️⃣ Capture enemy groups first
             adj(r, c).forEach(([rr, cc]) => {
                 const p = G.board[rr][cc];
                 if (!p || p.owner !== enemy) return;
 
-                // Check if this enemy piece is fully surrounded by the current owner
-                const surrounding = adj(rr, cc);
-                const fullySurrounded = surrounding.every(([sr, sc]) => {
-                    const cell = G.board[sr][sc];
-                    return cell && cell.owner === owner; // only count the placing player
+                const key = rr + "," + cc;
+                if (checked.has(key)) return;
+
+                const group = getGroup(rr, cc, enemy);
+                group.forEach(([gr, gc]) => checked.add(gr + "," + gc));
+
+                if (!groupHasLiberty(group)) {
+                    captureGroup(group);
+                    enemyCaptured = true;
+                }
+            });
+
+            // 2️⃣ Check suicide on placed group
+            const myGroup = getGroup(r, c, owner);
+
+            if (!groupHasLiberty(myGroup) && !enemyCaptured) {
+                // SUICIDE → undo placement
+                myGroup.forEach(([gr, gc]) => {
+                    const killed = G.board[gr][gc];
+                    G.board[gr][gc] = null;
+                    (killed.owner === "player" ? G.player : G.ai).dead.push(killed);
+                    popup(`Suicide: ${ICON[killed.owner][killed.type]}`, "purple");
                 });
-
-                if (fullySurrounded) toRemove.push([rr, cc, p]);
-            });
-
-            // Remove fully surrounded enemy pieces
-            toRemove.forEach(([rr, cc, p]) => {
-                G.board[rr][cc] = null;
-                (p.owner === "player" ? G.player : G.ai).dead.push(p);
-                popup(`Surrounded: ${ICON[p.owner][p.type]}`, "yellow");
-            });
+            }
         }
 
         function surroundScore(r, c, owner) {
+            if (G.board[r][c]) return -Infinity;
+
             const enemy = owner === "player" ? "ai" : "player";
+
+            // simulate placement
+            G.board[r][c] = {
+                owner
+            };
+
             let score = 0;
+            const checked = new Set();
 
             adj(r, c).forEach(([rr, cc]) => {
                 const p = G.board[rr][cc];
                 if (!p || p.owner !== enemy) return;
 
-                const friendlyAround = adj(rr, cc).filter(([r2, c2]) => {
-                    const q = G.board[r2][c2];
-                    return q && q.owner === owner;
-                }).length;
+                const key = rr + "," + cc;
+                if (checked.has(key)) return;
 
-                // Strongly reward getting close to a full surround
-                if (friendlyAround === 3) score += 100; // next move kills
-                else if (friendlyAround === 2) score += 30;
-                else if (friendlyAround === 1) score += 10;
+                const group = getGroup(rr, cc, enemy);
+                group.forEach(([gr, gc]) => checked.add(gr + "," + gc));
+
+                const liberties = countLiberties(group);
+
+                // scoring based on danger level
+                if (liberties === 0) score += 500 + group.length * 100; // kill
+                else if (liberties === 1) score += 200 + group.length * 50; // almost dead
+                else if (liberties === 2) score += 80 + group.length * 20; // pressure
+                else score += 10;
             });
+
+            // anti-suicide
+            const myGroup = getGroup(r, c, owner);
+            const myLib = countLiberties(myGroup);
+
+            if (myLib === 0) score -= 1000;
+
+            // undo simulation
+            G.board[r][c] = null;
 
             return score;
         }
@@ -564,6 +716,15 @@
             }
 
             return best === Infinity ? 0 : Math.max(0, 6 - best);
+        }
+
+        function captureGroup(group) {
+            group.forEach(([r, c]) => {
+                const killed = G.board[r][c];
+                G.board[r][c] = null;
+                (killed.owner === "player" ? G.player : G.ai).dead.push(killed);
+                popup(`Captured: ${ICON[killed.owner][killed.type]}`, "yellow");
+            });
         }
 
         /* ================= POPUP ================= */
@@ -591,11 +752,11 @@
         /* ================= SPELLS ================= */
         const SPELLS = {
             flare: {
-                cost: 2,
+                cost: 3,
                 dmg: 200
             },
             ultima: {
-                cost: 4,
+                cost: 5,
                 dmg: 400
             },
             requiem: {
@@ -603,26 +764,26 @@
                 dmg: 800
             },
             life1: {
-                cost: 3,
+                cost: 2,
                 revive: 1
             },
             life2: {
-                cost: 5,
+                cost: 4,
                 revive: 2
             },
             haste1: {
-                cost: 2,
+                cost: 3,
                 draw: 1
             },
             haste2: {
-                cost: 4,
+                cost: 5,
                 draw: 2
             },
             dispel: {
-                cost: 3
+                cost: 4
             },
             break: {
-                cost: 6
+                cost: 7
             }
         };
 
@@ -691,19 +852,16 @@
         let sel = null;
 
         function placePiece(owner, card, r, c) {
+            if (G.kingPending) return;
             if (owner === "player" && G.placements <= 0) return;
             if (G.gameOver || G.board[r][c]) return;
 
-            const id = uid(owner, card.type);
-            const pool = PIECE_IMAGES[owner][card.type];
-            const img = pool.shift(); // permanently consume one image
-
             const piece = {
-                id,
+                id: card.id,
                 owner,
                 type: card.type,
                 atk: BASE[card.type],
-                img // 🔥 per-instance image
+                img: card.img
             };
 
             G.board[r][c] = piece;
@@ -730,18 +888,27 @@
             }
 
             // King ability
+            // King ability
             if (owner === "player" && card.type === "king") {
+                // Decrease placements immediately
+                G.placements--;
+                if (G.placements <= 0) sel = null;
+
                 G.kingPending = {
                     piece,
                     r,
                     c
                 };
+                lastPlacedR = r;
+                lastPlacedC = c;
+
                 modal.style.display = "flex";
                 render();
                 return;
             }
 
             applyAbility(piece, r, c);
+            applyAuraFromNeighbors(piece, r, c);
 
             // Surround enemies
             resolveSurroundAt(r, c, owner);
@@ -812,11 +979,13 @@
             // Place first card
             const card = G.ai.hand.shift();
             const piece = {
-                id: uid("ai", card.type),
+                id: card.id,
                 owner: "ai",
                 type: card.type,
-                atk: BASE[card.type]
+                atk: BASE[card.type],
+                img: card.img
             };
+
             G.board[r][c] = piece;
 
             applyAbility(piece, r, c);
@@ -1007,10 +1176,8 @@
             playerHand.innerHTML = "<b>Your Hand</b><br>";
             G.player.hand.forEach((p, i) => {
                 let b = document.createElement("button");
-                b.textContent = ICON.player[p.type] + " " + p.type;
                 b.innerHTML = `
-  <img src="${p.img}" style="width:24px;height:24px;vertical-align:middle">
-  ${p.type}
+  <img src="${p.img}" style="width:60px;height:60px;vertical-align:middle">
 `;
                 if (i === sel) b.classList.add("selected");
                 b.onclick = () => {
@@ -1026,9 +1193,8 @@
             playerGraveyard.innerHTML = "<b>Graveyard</b><br>";
             G.player.dead.forEach((p, i) => {
                 const span = document.createElement("span");
-                span.textContent = ICON.player[p.type];
                 span.innerHTML = `
-  <img src="${p.img}" style="width:20px;height:20px">
+  <img src="${p.img}" style="width:60px;height:60px">
 `;
                 span.onclick = () => selectRevive('player', i);
                 playerGraveyard.appendChild(span);
@@ -1045,10 +1211,8 @@
             aiHand.innerHTML = "<b>AI Hand</b><br>";
             G.ai.hand.forEach((p, i) => {
                 const b = document.createElement("button");
-                b.textContent = ICON.ai[p.type] + " " + p.type;
                 b.innerHTML = `
-  <img src="${p.img}" style="width:24px;height:24px;vertical-align:middle;opacity:0.7">
-  ${p.type}
+  <img src="${p.img}" style="width:60px;height:60px;vertical-align:middle;opacity:0.7">
 `;
                 b.disabled = true; // AI hand cards are not selectable
                 b.style.opacity = 0.6; // Slightly faded to indicate AI ownership
@@ -1059,10 +1223,9 @@
             aiGraveyard.innerHTML = "<b>Graveyard</b><br>";
             G.ai.dead.forEach(p => {
                 const span = document.createElement("span");
-                span.textContent = ICON.ai[p.type];
                 aiGraveyard.appendChild(span);
                 span.innerHTML = `
-  <img src="${p.img}" style="width:20px;height:20px">
+  <img src="${p.img}" style="width:60px;height:60px">
 `;
             });
 
