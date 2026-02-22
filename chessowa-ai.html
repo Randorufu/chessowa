@@ -4,43 +4,68 @@
 <head>
     <meta charset="UTF-8">
     <title>Chess'owa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manufacturing+Consent&display=swap" rel="stylesheet">
     <style>
         body {
             background: #0b0b14;
             color: #eee;
             font-family: sans-serif;
-            text-align: center
+            text-align: center;
+        }
+        
+        h1 {
+            font-family: "Manufacturing Consent", system-ui;
+            font-size: 50px;
+            font-weight: 400;
+            font-style: normal;
+        }
+        
+        b {
+            font-family: "Manufacturing Consent", system-ui;
+            font-size: 30px;
+            font-weight: 400;
+            font-style: normal;
         }
 
         #game {
             display: grid;
             grid-template-columns: 260px auto 260px;
             gap: 10px;
-            padding: 10px
+            padding: 10px;
         }
 
         .panel {
             background: #161622;
             padding: 10px;
-            border-radius: 10px
+            border-radius: 10px;
         }
 
         #board {
             display: grid;
             grid-template-columns: repeat(8, 72px);
             gap: 2px;
-            margin: auto
+            margin: auto;
         }
 
         .cell {
             width: 72px;
             height: 72px;
-            background: #222;
+            background: #17171c;
             border-radius: 6px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            cursor: pointer
+            cursor: pointer;
+        }
+        
+        .cell:nth-child(1), .cell:nth-child(3), .cell:nth-child(5), .cell:nth-child(7), .cell:nth-child(10), .cell:nth-child(12), .cell:nth-child(14), .cell:nth-child(16),
+        .cell:nth-child(17), .cell:nth-child(19), .cell:nth-child(21), .cell:nth-child(23), .cell:nth-child(26), .cell:nth-child(28), .cell:nth-child(30), .cell:nth-child(32),
+        .cell:nth-child(33), .cell:nth-child(35), .cell:nth-child(37), .cell:nth-child(39), .cell:nth-child(42), .cell:nth-child(44), .cell:nth-child(46), .cell:nth-child(48),
+        .cell:nth-child(49), .cell:nth-child(51), .cell:nth-child(53), .cell:nth-child(55), .cell:nth-child(58), .cell:nth-child(60), .cell:nth-child(62), .cell:nth-child(64),
+        .cell:nth-child(66) {
+            background: #1d1d27;
         }
 
         .cell.player {
@@ -71,12 +96,33 @@
         }
 
         button {
-            background: #222;
-            color: #eee;
             border: 1px solid #444;
             padding: 6px;
             margin: 3px;
             border-radius: 6px;
+            position: relative;
+            color: rgb(207, 248, 255);
+            border: 3px solid transparent;
+            border-radius: 10px;
+            background-color: rgb(42, 42, 61);
+            background-image: linear-gradient(to bottom right, rgb(29,39,39), rgb(2, 10, 14)), linear-gradient(125deg, rgba(11,11,20,0) 45%, rgba(11,11,20,0.6) 50%, rgba(11,11,20,0) 53%);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            background-size: 100%, 200%;
+            background-position: 0px, -250px;
+            box-shadow: rgba(0,0,0,0.6) 8px 8px 8px;
+            text-shadow: 0px 0px 4px rgba(255,255,255,0.1);
+            transition: box-shadow 0.25s, text-shaddw 0.25s;
+            overflow: hidden;
+        }
+        
+        .glint {
+            background-image: linear-gradient(to bottom right, rgb(11,11,20), rgb(2, 10, 14)), linear-gradient(125deg, rgba(255,255,255,0) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0)53%);
+            animation: 6s border-glint linear backwards infinite;
+        }
+        
+        .handpadding {
+            padding: 0;
         }
 
         .selected {
@@ -90,7 +136,6 @@
             transform: translate(-50%, -50%) scale(0.6);
             font-size: 64px;
             font-weight: bold;
-            color: #ff4444;
             opacity: 0;
             transition: all .4s ease;
             pointer-events: none;
@@ -125,25 +170,66 @@
 
         .popup {
             position: fixed;
-            top: 40%;
+            top: 35%;
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 48px;
             font-weight: bold;
-            animation: fadeUp .9s ease forwards;
             pointer-events: none;
+            z-index: 1;
         }
 
-        @keyframes fadeUp {
-            from {
-                opacity: 1;
-                transform: translate(-50%, -50%)
-            }
+        .shiny-button {
+          position: relative;
+          color: rgb(207, 248, 255);
+          border: 3px solid transparent;
+          border-radius: 10px;
+          background-color: rgb(6, 69, 73);
+          background-image: linear-gradient(to bottom right, rgb(10,107,115), rgb(2, 10, 14)), linear-gradient(125deg, rgba(255,255,255,0) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 53%);
+          background-origin: border-box;
+          background-clip: padding-box, border-box;
+          background-size: 100%, 200%;
+          background-position: 0px, -250px;
+          animation: 6s border-glint linear backwards infinite;
+          box-shadow: rgba(0,0,0,0.6) 8px 8px 8px;
+          text-shadow: 0px 0px 4px rgba(255,255,255,0.1);
+          transition: box-shadow 0.25s, text-shaddw 0.25s;
+          overflow: hidden;
+        }
 
-            to {
-                opacity: 0;
-                transform: translate(-50%, -80%)
-            }
+        .shiny-button:hover {
+          cursor: pointer;
+          background-image: linear-gradient(to bottom right, rgb(24, 77, 177), rgb(24, 77, 177)), linear-gradient(125deg, rgba(255,255,255,0) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 53%);
+          color: rgb(250, 250, 255);
+          box-shadow: rgba(0,0,0,0.7) 5px 5px 5px;
+          text-shadow: 0px 0px 3px rgba(255,255,255,0.7);
+          transition: box-shadow 0.25s, text-shaddw 0.25s;
+        }
+
+        .shiny-button::after {
+          content: ' ';
+          position: absolute;
+          top: -50%;
+          left: -120%;
+          width: 200%;
+          height: 200%;
+          background-image: linear-gradient(125deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 52%);
+          animation: 6s glint linear backwards infinite;
+          animation-delay: -3s;
+        }
+
+        @keyframes glint {
+          0% { left: -120%; }
+          8% { left: 50%; }
+          100% { left: 50%; }
+        }
+
+
+        @keyframes border-glint {
+          0% { background-position: 0px, -250px; }
+          25% { background-position: 0px, -200px; }
+          75% { background-position: 0px, 50px; }
+          100% { background-position: 0px, 50px; }
         }
 
     </style>
@@ -154,22 +240,22 @@
 
     <div id="game">
         <div class="panel" id="playerPanel">
-            <div id="playerStatus"></div>
-            <div id="playerHand"></div>
+            <div id="playerStatus"></div><br>
+            <div id="playerHand"></div><br>
             <div id="playerGraveyard"></div>
         </div>
 
         <div id="board"></div>
 
         <div class="panel" id="aiPanel">
-            <div id="aiStatus"></div>
-            <div id="aiHand"></div>
+            <div id="aiStatus"></div><br>
+            <div id="aiHand"></div><br>
             <div id="aiGraveyard"></div>
         </div>
     </div>
 
     <div class="panel" id="spells"></div>
-    <button onclick="endTurn()">End Turn</button>
+    <br><button onclick="endTurn()" id="endTurn">End Turn</button>
 
     <div id="modal">
         <div>
@@ -180,6 +266,7 @@
     </div>
 
     <script>
+        
         /* ================= CONSTANTS ================= */
         const ICON = {
             player: {
@@ -366,10 +453,10 @@
             if (caster.mp < s.cost) return false;
 
             // Special restrictions
-            if (spellName === "haste1" && caster.hand.length === 0) return false;
-            if (spellName === "haste2" && caster.hand.length < 2) return false;
-            if (spellName === "life1" && caster.dead.length < 1) return false;
-            if (spellName === "life2" && caster.dead.length < 2) return false;
+            if (spellName === "Haste I" && caster.hand.length === 0) return false;
+            if (spellName === "Haste II" && caster.hand.length < 2) return false;
+            if (spellName === "Life I" && caster.dead.length < 1) return false;
+            if (spellName === "Life II" && caster.dead.length < 2) return false;
 
             return true;
         }
@@ -569,10 +656,10 @@
         function resolveKingChoice(choice) {
             if (choice === "damage") {
                 G.ai.hp -= 200;
-                popup("-200");
+                popup("⚔️ King Attacks!", "dodgerblue");
             } else {
                 G.ai.mp = Math.max(0, G.ai.mp - 2);
-                popup("-2 MP", "purple");
+                popup("Enemy loses 2MP", "dodgerblue");
             }
             modal.style.display = "none";
             G.kingPending = null;
@@ -720,24 +807,38 @@
 
         function captureGroup(group) {
             group.forEach(([r, c]) => {
+                popup("Captured!", "yellow");
                 const killed = G.board[r][c];
                 G.board[r][c] = null;
                 (killed.owner === "player" ? G.player : G.ai).dead.push(killed);
-                popup(`Captured: ${ICON[killed.owner][killed.type]}`, "yellow");
             });
         }
 
         /* ================= POPUP ================= */
-        function showDamage(amount, cb) {
+        function showDamage(amount, cb, color = "dodgerblue") {
             let d = document.createElement("div");
             d.className = "damage-popup";
+            d.style.color = color;
             d.textContent = "⚔️ " + amount;
             document.body.appendChild(d);
             requestAnimationFrame(() => d.classList.add("show"));
             setTimeout(() => {
                 d.remove();
                 cb && cb();
-            }, 900);
+            }, 1500);
+        }
+        
+        function aiShowDamage(amount, cb, color = "firebrick") {
+            let d = document.createElement("div");
+            d.className = "damage-popup";
+            d.textContent = "⚔️ " + amount;
+            d.style.color = color;
+            document.body.appendChild(d);
+            requestAnimationFrame(() => d.classList.add("show"));
+            setTimeout(() => {
+                d.remove();
+                cb && cb();
+            }, 1500);
         }
 
         function popup(text, color = "red") {
@@ -746,43 +847,43 @@
             d.style.color = color;
             d.textContent = text;
             document.body.appendChild(d);
-            setTimeout(() => d.remove(), 900);
+            setTimeout(() => d.remove(), 1500);
         }
 
         /* ================= SPELLS ================= */
         const SPELLS = {
-            flare: {
+            Flare: {
                 cost: 3,
                 dmg: 200
             },
-            ultima: {
+            Ultima: {
                 cost: 5,
                 dmg: 400
             },
-            requiem: {
+            Requiem: {
                 cost: 7,
                 dmg: 800
             },
-            life1: {
+            'Life I': {
                 cost: 2,
                 revive: 1
             },
-            life2: {
+            'Life II': {
                 cost: 4,
                 revive: 2
             },
-            haste1: {
+            'Haste I': {
                 cost: 3,
                 draw: 1
             },
-            haste2: {
+            'Haste II': {
                 cost: 5,
                 draw: 2
             },
-            dispel: {
+            Dispel: {
                 cost: 4
             },
-            break: {
+            Break: {
                 cost: 7
             }
         };
@@ -792,9 +893,9 @@
             while (n-- && side.dead.length) side.hand.push(side.dead.pop());
         }
 
-        function dispel(breakAtk) {
+        function dispel(BreakAtk) {
             G.board.flat().forEach(p => {
-                if (p) p.atk = breakAtk ? 0 : BASE[p.type]
+                if (p) p.atk = BreakAtk ? 0 : BASE[p.type]
             });
         }
 
@@ -808,7 +909,7 @@
 
             if (s.dmg) {
                 target.hp -= s.dmg;
-                popup("-" + s.dmg, "orange");
+                popup("🔥 -" + s.dmg, "dodgerblue");
             }
 
             if (s.revive) {
@@ -828,9 +929,9 @@
                 for (let i = 0; i < s.draw; i++) draw(caster);
             }
 
-            if (name === "dispel" || name === "break") {
+            if (name === "Dispel" || name === "Break") {
                 G.board.flat().forEach(p => {
-                    if (p) p.atk = name === "break" ? 0 : BASE[p.type];
+                    if (p) p.atk = name === "Break" ? 0 : BASE[p.type];
                 });
             }
 
@@ -916,13 +1017,19 @@
             // Decrease placements for player
             if (owner === "player") {
                 G.placements--;
-                if (G.placements <= 0) sel = null; // clear selection if no placements left
+                let eT = document.getElementById("endTurn");
+                if (G.placements <= 0) {
+                    sel = null; // clear selection if no placements left
+                    eT.classList.add("glint", "shiny-button");
+                }
             }
 
             render();
         }
 
         function endTurn() {
+            let eT = document.getElementById("endTurn");
+            eT.classList.remove("glint", "shiny-button");
             let dmg = G.board.flat().reduce((s, p) => p && p.owner === "player" ? s + p.atk : s, 0);
             showDamage(dmg, () => {
                 G.ai.hp -= dmg;
@@ -1117,7 +1224,7 @@
                 0
             );
 
-            showDamage(dmg, () => {
+            aiShowDamage(dmg, () => {
                 G.player.hp -= dmg;
                 if (checkWin()) return;
                 startTurn("player");
@@ -1131,7 +1238,7 @@
         /* ================= AI SPELL LOGIC ================= */
         function aiChooseSpell() {
             // Pick a random spell to "plan" — exclude life1/life2
-            const candidateSpells = ["flare", "ultima", "requiem", "dispel", "break"];
+            const candidateSpells = ["Flare", "Ultima", "Requiem", "Dispel", "Break"];
             G.ai.nextSpell = candidateSpells[Math.floor(Math.random() * candidateSpells.length)];
         }
 
@@ -1145,10 +1252,10 @@
 
             // 33% chance to override with life spell if there are dead AI pieces
             const rand = Math.random();
-            if (G.ai.dead.length >= 2 && rand < 0.33 && canCastSpell(G.ai, "life2")) {
-                spellToCast = "life2";
-            } else if (G.ai.dead.length === 1 && rand < 0.33 && canCastSpell(G.ai, "life1")) {
-                spellToCast = "life1";
+            if (G.ai.dead.length >= 2 && rand < 0.33 && canCastSpell(G.ai, "Life II")) {
+                spellToCast = "Life II";
+            } else if (G.ai.dead.length === 1 && rand < 0.33 && canCastSpell(G.ai, "Life I")) {
+                spellToCast = "Life I";
             }
 
             // Only cast if possible; if not, keep planned spell for future turns
@@ -1156,7 +1263,7 @@
                 castSpell(G.ai, G.player, spellToCast);
 
                 // If it was a normal planned spell, reset nextSpell for new random pick next turn
-                if (spellToCast !== "life1" && spellToCast !== "life2") {
+                if (spellToCast !== "Life I" && spellToCast !== "Life II") {
                     G.ai.nextSpell = null;
                 }
             }
@@ -1173,12 +1280,13 @@
   `;
 
             // ===== PLAYER HAND =====
-            playerHand.innerHTML = "<b>Your Hand</b><br>";
+            playerHand.innerHTML = "<b>Hand</b><br>";
             G.player.hand.forEach((p, i) => {
                 let b = document.createElement("button");
                 b.innerHTML = `
   <img src="${p.img}" style="width:60px;height:60px;vertical-align:middle">
 `;
+                b.classList.add("glint", "handpadding");
                 if (i === sel) b.classList.add("selected");
                 b.onclick = () => {
                     if (G.turn !== "player") return;
@@ -1202,20 +1310,20 @@
 
             // ===== AI STATUS =====
             aiStatus.innerHTML = `
-    <b>AI</b><br>
+    <b>Opponent</b><br>
     HP: ${G.ai.hp} MP: ${G.ai.mp}<br>
     Last Spell: ${G.ai.lastSpell || "None"}
   `;
 
             // ===== AI HAND =====
-            aiHand.innerHTML = "<b>AI Hand</b><br>";
+            aiHand.innerHTML = "<b>Hand</b><br>";
             G.ai.hand.forEach((p, i) => {
                 const b = document.createElement("button");
                 b.innerHTML = `
   <img src="${p.img}" style="width:60px;height:60px;vertical-align:middle;opacity:0.7">
 `;
+                b.classList.add("handpadding");
                 b.disabled = true; // AI hand cards are not selectable
-                b.style.opacity = 0.6; // Slightly faded to indicate AI ownership
                 aiHand.appendChild(b);
             });
 
@@ -1269,6 +1377,7 @@
                 const s = SPELLS[name];
                 const b = document.createElement("button");
                 b.textContent = `${name.toUpperCase()} (${s.cost} MP)`;
+                b.classList.add("shiny-button");
                 b.onclick = () => {
                     if (G.turn !== "player") return;
                     castSpell(G.player, G.ai, name);
@@ -1277,6 +1386,7 @@
                 if (!canCastSpell(G.player, name) || G.spellUsed) {
                     b.disabled = true;
                     b.style.opacity = 0.4;
+                    b.classList.remove("shiny-button");
                 }
 
                 spells.appendChild(b);
