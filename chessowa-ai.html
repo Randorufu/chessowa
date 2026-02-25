@@ -14,14 +14,14 @@
             font-family: sans-serif;
             text-align: center;
         }
-        
+
         h1 {
             font-family: "Manufacturing Consent", system-ui;
             font-size: 50px;
             font-weight: 400;
             font-style: normal;
         }
-        
+
         b {
             font-family: "Manufacturing Consent", system-ui;
             font-size: 30px;
@@ -59,11 +59,39 @@
             justify-content: center;
             cursor: pointer;
         }
-        
-        .cell:nth-child(1), .cell:nth-child(3), .cell:nth-child(5), .cell:nth-child(7), .cell:nth-child(10), .cell:nth-child(12), .cell:nth-child(14), .cell:nth-child(16),
-        .cell:nth-child(17), .cell:nth-child(19), .cell:nth-child(21), .cell:nth-child(23), .cell:nth-child(26), .cell:nth-child(28), .cell:nth-child(30), .cell:nth-child(32),
-        .cell:nth-child(33), .cell:nth-child(35), .cell:nth-child(37), .cell:nth-child(39), .cell:nth-child(42), .cell:nth-child(44), .cell:nth-child(46), .cell:nth-child(48),
-        .cell:nth-child(49), .cell:nth-child(51), .cell:nth-child(53), .cell:nth-child(55), .cell:nth-child(58), .cell:nth-child(60), .cell:nth-child(62), .cell:nth-child(64),
+
+        .cell:nth-child(1),
+        .cell:nth-child(3),
+        .cell:nth-child(5),
+        .cell:nth-child(7),
+        .cell:nth-child(10),
+        .cell:nth-child(12),
+        .cell:nth-child(14),
+        .cell:nth-child(16),
+        .cell:nth-child(17),
+        .cell:nth-child(19),
+        .cell:nth-child(21),
+        .cell:nth-child(23),
+        .cell:nth-child(26),
+        .cell:nth-child(28),
+        .cell:nth-child(30),
+        .cell:nth-child(32),
+        .cell:nth-child(33),
+        .cell:nth-child(35),
+        .cell:nth-child(37),
+        .cell:nth-child(39),
+        .cell:nth-child(42),
+        .cell:nth-child(44),
+        .cell:nth-child(46),
+        .cell:nth-child(48),
+        .cell:nth-child(49),
+        .cell:nth-child(51),
+        .cell:nth-child(53),
+        .cell:nth-child(55),
+        .cell:nth-child(58),
+        .cell:nth-child(60),
+        .cell:nth-child(62),
+        .cell:nth-child(64),
         .cell:nth-child(66) {
             background: #1d1d27;
         }
@@ -86,6 +114,10 @@
             height: 72px;
         }
 
+        #playerGraveyard span img {
+            cursor: pointer;
+        }
+
         .atk {
             font-size: 13px;
             padding: 0;
@@ -105,22 +137,22 @@
             border: 3px solid transparent;
             border-radius: 10px;
             background-color: rgb(42, 42, 61);
-            background-image: linear-gradient(to bottom right, rgb(29,39,39), rgb(2, 10, 14)), linear-gradient(125deg, rgba(11,11,20,0) 45%, rgba(11,11,20,0.6) 50%, rgba(11,11,20,0) 53%);
+            background-image: linear-gradient(to bottom right, rgb(29, 39, 39), rgb(2, 10, 14)), linear-gradient(125deg, rgba(11, 11, 20, 0) 45%, rgba(11, 11, 20, 0.6) 50%, rgba(11, 11, 20, 0) 53%);
             background-origin: border-box;
             background-clip: padding-box, border-box;
             background-size: 100%, 200%;
             background-position: 0px, -250px;
-            box-shadow: rgba(0,0,0,0.6) 8px 8px 8px;
-            text-shadow: 0px 0px 4px rgba(255,255,255,0.1);
+            box-shadow: rgba(0, 0, 0, 0.6) 8px 8px 8px;
+            text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.1);
             transition: box-shadow 0.25s, text-shaddw 0.25s;
             overflow: hidden;
         }
-        
+
         .glint {
-            background-image: linear-gradient(to bottom right, rgb(11,11,20), rgb(2, 10, 14)), linear-gradient(125deg, rgba(255,255,255,0) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0)53%);
+            background-image: linear-gradient(to bottom right, rgb(11, 11, 20), rgb(2, 10, 14)), linear-gradient(125deg, rgba(255, 255, 255, 0) 45%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0)53%);
             animation: 6s border-glint linear backwards infinite;
         }
-        
+
         .handpadding {
             padding: 0;
         }
@@ -140,6 +172,11 @@
             transition: all .4s ease;
             pointer-events: none;
             z-index: 99;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+            padding: 0px 30px 10px 30px;
+            border-width: 2px;
+            border-style: solid;
+            border-image: linear-gradient(to right, rgba(30, 144, 255, 0), rgba(30, 144, 255, 0.5), rgba(30, 144, 255, 0.8), rgba(30, 144, 255, 0.5), rgba(30, 144, 255, 0)) 1;
         }
 
         .damage-popup.show {
@@ -180,56 +217,75 @@
         }
 
         .shiny-button {
-          position: relative;
-          color: rgb(207, 248, 255);
-          border: 3px solid transparent;
-          border-radius: 10px;
-          background-color: rgb(6, 69, 73);
-          background-image: linear-gradient(to bottom right, rgb(10,107,115), rgb(2, 10, 14)), linear-gradient(125deg, rgba(255,255,255,0) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 53%);
-          background-origin: border-box;
-          background-clip: padding-box, border-box;
-          background-size: 100%, 200%;
-          background-position: 0px, -250px;
-          animation: 6s border-glint linear backwards infinite;
-          box-shadow: rgba(0,0,0,0.6) 8px 8px 8px;
-          text-shadow: 0px 0px 4px rgba(255,255,255,0.1);
-          transition: box-shadow 0.25s, text-shaddw 0.25s;
-          overflow: hidden;
+            position: relative;
+            color: rgb(207, 248, 255);
+            border: 3px solid transparent;
+            border-radius: 10px;
+            background-color: rgb(6, 69, 73);
+            background-image: linear-gradient(to bottom right, rgb(10, 107, 115), rgb(2, 10, 14)), linear-gradient(125deg, rgba(255, 255, 255, 0) 45%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 53%);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            background-size: 100%, 200%;
+            background-position: 0px, -250px;
+            animation: 6s border-glint linear backwards infinite;
+            box-shadow: rgba(0, 0, 0, 0.6) 8px 8px 8px;
+            text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.1);
+            transition: box-shadow 0.25s, text-shaddw 0.25s;
+            overflow: hidden;
         }
 
         .shiny-button:hover {
-          cursor: pointer;
-          background-image: linear-gradient(to bottom right, rgb(24, 77, 177), rgb(24, 77, 177)), linear-gradient(125deg, rgba(255,255,255,0) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 53%);
-          color: rgb(250, 250, 255);
-          box-shadow: rgba(0,0,0,0.7) 5px 5px 5px;
-          text-shadow: 0px 0px 3px rgba(255,255,255,0.7);
-          transition: box-shadow 0.25s, text-shaddw 0.25s;
+            cursor: pointer;
+            background-image: linear-gradient(to bottom right, rgb(24, 77, 177), rgb(24, 77, 177)), linear-gradient(125deg, rgba(255, 255, 255, 0) 45%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 53%);
+            color: rgb(250, 250, 255);
+            box-shadow: rgba(0, 0, 0, 0.7) 5px 5px 5px;
+            text-shadow: 0px 0px 3px rgba(255, 255, 255, 0.7);
+            transition: box-shadow 0.25s, text-shaddw 0.25s;
         }
 
         .shiny-button::after {
-          content: ' ';
-          position: absolute;
-          top: -50%;
-          left: -120%;
-          width: 200%;
-          height: 200%;
-          background-image: linear-gradient(125deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 52%);
-          animation: 6s glint linear backwards infinite;
-          animation-delay: -3s;
+            content: ' ';
+            position: absolute;
+            top: -50%;
+            left: -120%;
+            width: 200%;
+            height: 200%;
+            background-image: linear-gradient(125deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 52%);
+            animation: 6s glint linear backwards infinite;
+            animation-delay: -3s;
         }
 
         @keyframes glint {
-          0% { left: -120%; }
-          8% { left: 50%; }
-          100% { left: 50%; }
+            0% {
+                left: -120%;
+            }
+
+            8% {
+                left: 50%;
+            }
+
+            100% {
+                left: 50%;
+            }
         }
 
 
         @keyframes border-glint {
-          0% { background-position: 0px, -250px; }
-          25% { background-position: 0px, -200px; }
-          75% { background-position: 0px, 50px; }
-          100% { background-position: 0px, 50px; }
+            0% {
+                background-position: 0px, -250px;
+            }
+
+            25% {
+                background-position: 0px, -200px;
+            }
+
+            75% {
+                background-position: 0px, 50px;
+            }
+
+            100% {
+                background-position: 0px, 50px;
+            }
         }
 
     </style>
@@ -266,7 +322,6 @@
     </div>
 
     <script>
-        
         /* ================= CONSTANTS ================= */
         const ICON = {
             player: {
@@ -632,6 +687,13 @@
                     let killed = G.board[tr][tc];
                     G.board[tr][tc] = null;
                     op.dead.push(killed);
+                    
+                    if (p.owner === "player") {
+                        popup("🗡️ Captured", "dodgerblue");
+                        return;
+                    } else {
+                        popup("🗡️ Captured", "firebrick");
+                        }
                 }
             }
         }
@@ -659,7 +721,7 @@
                 popup("⚔️ King Attacks!", "dodgerblue");
             } else {
                 G.ai.mp = Math.max(0, G.ai.mp - 2);
-                popup("Enemy loses 2MP", "dodgerblue");
+                popup("Enemy loses MP", "dodgerblue");
             }
             modal.style.display = "none";
             G.kingPending = null;
@@ -805,49 +867,72 @@
             return best === Infinity ? 0 : Math.max(0, 6 - best);
         }
 
-        function captureGroup(group) {
+        function captureGroup(group, owner) {
             group.forEach(([r, c]) => {
-                popup("Captured!", "yellow");
                 const killed = G.board[r][c];
                 G.board[r][c] = null;
                 (killed.owner === "player" ? G.player : G.ai).dead.push(killed);
             });
+            if (owner === "player") {
+                        popup("🗡️ Captured", "dodgerblue");
+                        return;
+                    } else {
+                        popup("🗡️ Captured", "firebrick");
+                        }
         }
 
         /* ================= POPUP ================= */
         function showDamage(amount, cb, color = "dodgerblue") {
-            let d = document.createElement("div");
-            d.className = "damage-popup";
-            d.style.color = color;
-            d.textContent = "⚔️ " + amount;
-            document.body.appendChild(d);
-            requestAnimationFrame(() => d.classList.add("show"));
-            setTimeout(() => {
-                d.remove();
-                cb && cb();
-            }, 1500);
+            queuePopup("⚔️ " + amount, color, 1500, cb);
         }
-        
+
         function aiShowDamage(amount, cb, color = "firebrick") {
-            let d = document.createElement("div");
-            d.className = "damage-popup";
-            d.textContent = "⚔️ " + amount;
-            d.style.color = color;
-            document.body.appendChild(d);
-            requestAnimationFrame(() => d.classList.add("show"));
-            setTimeout(() => {
-                d.remove();
-                cb && cb();
-            }, 1500);
+            queuePopup("⚔️ " + amount, color, 1500, cb);
         }
 
         function popup(text, color = "red") {
+            queuePopup(text, color, 1500);
+        }
+
+        /* ================= POPUP QUEUE ================= */
+        const popupQueue = [];
+        let popupActive = false;
+
+        function queuePopup(text, color = "red", duration = 1500, cb = null) {
+            popupQueue.push({
+                text,
+                color,
+                duration,
+                cb
+            });
+            processPopupQueue();
+        }
+
+        function processPopupQueue() {
+            if (popupActive || !popupQueue.length) return;
+
+            popupActive = true;
+            const {
+                text,
+                color,
+                duration,
+                cb
+            } = popupQueue.shift();
+
             const d = document.createElement("div");
-            d.className = "popup";
+            d.className = "damage-popup";
             d.style.color = color;
             d.textContent = text;
             document.body.appendChild(d);
-            setTimeout(() => d.remove(), 1500);
+
+            requestAnimationFrame(() => d.classList.add("show"));
+
+            setTimeout(() => {
+                d.remove();
+                popupActive = false;
+                cb && cb();
+                processPopupQueue();
+            }, duration);
         }
 
         /* ================= SPELLS ================= */
@@ -909,30 +994,48 @@
 
             if (s.dmg) {
                 target.hp -= s.dmg;
-                popup("🔥 -" + s.dmg, "dodgerblue");
+                if (caster === G.player) {
+                    popup("🔥 " + caster.lastSpell, "dodgerblue");
+                    return;
+                } else {
+                    popup("🔥 " + caster.lastSpell, "firebrick");
+                }
             }
 
             if (s.revive) {
                 if (caster === G.player) {
                     reviveQueue = Array(s.revive).fill(true);
-                    alert("Select pieces from your graveyard to revive");
+                    popup("Select pieces to revive", "dodgerblue");
                     return;
                 } else {
                     for (let i = 0; i < s.revive; i++) {
                         const g = caster.dead.pop();
                         if (g) caster.hand.push(g);
+                        popup("🪽 " + caster.lastSpell, "firebrick");
                     }
                 }
             }
 
             if (s.draw) {
                 for (let i = 0; i < s.draw; i++) draw(caster);
+                if (caster === G.player) {
+                        popup("💫 " + caster.lastSpell, "dodgerblue");
+                        return;
+                } else {
+                        popup("💫 " + caster.lastSpell, "firebrick");
+                    }
             }
 
             if (name === "Dispel" || name === "Break") {
                 G.board.flat().forEach(p => {
                     if (p) p.atk = name === "Break" ? 0 : BASE[p.type];
                 });
+                if (caster === G.player) {
+                        popup("💫 " + caster.lastSpell, "dodgerblue");
+                        return;
+                } else {
+                        popup("💫 " + caster.lastSpell, "firebrick");
+                    }
             }
 
             render();
@@ -989,7 +1092,6 @@
             }
 
             // King ability
-            // King ability
             if (owner === "player" && card.type === "king") {
                 // Decrease placements immediately
                 G.placements--;
@@ -1005,6 +1107,8 @@
 
                 modal.style.display = "flex";
                 render();
+                let eT = document.getElementById("endTurn");
+                eT.classList.add("glint", "shiny-button");
                 return;
             }
 
@@ -1216,21 +1320,29 @@
             placePiece("ai", card, move.r, move.c);
 
             /* ================= SPELL PHASE ================= */
-            aiCastSpell();
+            const spellName = aiCastSpell();
 
-            /* ================= DAMAGE PHASE ================= */
-            const dmg = G.board.flat().reduce(
-                (s, p) => (p && p.owner === "ai" ? s + p.atk : s),
-                0
-            );
+            /* ================= SPELL POPUP → DAMAGE FLOW ================= */
+            const resolveAiDamage = () => {
+                setTimeout(() => {
 
-            aiShowDamage(dmg, () => {
-                G.player.hp -= dmg;
-                if (checkWin()) return;
-                startTurn("player");
-                drawUntil(G.player, 3);
-                render();
-            });
+                    const dmg = G.board.flat().reduce(
+                        (s, p) => (p && p.owner === "ai" ? s + p.atk : s),
+                        0
+                    );
+
+                    aiShowDamage(dmg, () => {
+                        G.player.hp -= dmg;
+                        if (checkWin()) return;
+                        startTurn("player");
+                        drawUntil(G.player, 3);
+                        render();
+                    });
+
+                }, 900);
+            };
+
+                resolveAiDamage();
         }
 
 
@@ -1243,14 +1355,12 @@
         }
 
         function aiCastSpell() {
-            if (G.spellUsed) return;
+            if (G.spellUsed) return null;
 
-            // Ensure AI has a planned spell
             if (!G.ai.nextSpell) aiChooseSpell();
 
             let spellToCast = G.ai.nextSpell;
 
-            // 33% chance to override with life spell if there are dead AI pieces
             const rand = Math.random();
             if (G.ai.dead.length >= 2 && rand < 0.33 && canCastSpell(G.ai, "Life II")) {
                 spellToCast = "Life II";
@@ -1258,15 +1368,17 @@
                 spellToCast = "Life I";
             }
 
-            // Only cast if possible; if not, keep planned spell for future turns
             if (canCastSpell(G.ai, spellToCast)) {
                 castSpell(G.ai, G.player, spellToCast);
 
-                // If it was a normal planned spell, reset nextSpell for new random pick next turn
                 if (spellToCast !== "Life I" && spellToCast !== "Life II") {
                     G.ai.nextSpell = null;
                 }
+
+                return spellToCast;
             }
+
+            return null;
         }
 
         /* ================= RENDER ================= */
