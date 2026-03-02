@@ -15,6 +15,61 @@
             text-align: center;
         }
 
+        #themeToggle {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            z-index: 200;
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 32px;
+            height: 20px;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .switchtxt {
+            position: relative;
+            top: -3px;
+            padding-right: 3px;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #444;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+
+        .slider:before {
+            content: "";
+            position: absolute;
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #1e90ff;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(11px);
+        }
+
         h1 {
             font-family: "Manufacturing Consent", system-ui;
             font-size: 50px;
@@ -27,6 +82,11 @@
             font-size: 30px;
             font-weight: 400;
             font-style: normal;
+        }
+        
+        #playerLastSpell b, #aiLastSpell b {
+            font-family: sans-serif;
+            font-size: 16px;
         }
 
         #game {
@@ -127,6 +187,23 @@
             font-weight: bold;
         }
 
+        .handatk {
+            font-size: 12px;
+            margin-top: -13.6px;
+        }
+
+        .graveyardatk {
+            font-size: 12px;
+            margin-top: -14px;
+            width: 60px;
+        }
+
+        .graveIcon {
+            width: 60px;
+            display: inline-block;
+            padding: 3px;
+        }
+
         button {
             border: 1px solid #444;
             padding: 6px;
@@ -167,7 +244,7 @@
             top: 50%;
             transform: translate(-50%, -50%) scale(0.6);
             font-size: 64px;
-            font-weight: bold;
+            font-weight: 600;
             opacity: 0;
             transition: all .4s ease;
             pointer-events: none;
@@ -292,11 +369,33 @@
 </head>
 
 <body>
+    <!-- Theme Toggle -->
+    <div style="position: fixed; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 12px; z-index: 1000; text-align: right;">
+        <div>
+            <span class="switchtxt">FF</span>
+            <label class="switch">
+                <input type="checkbox" id="imageSwitch">
+                <span class="slider"></span>
+            </label>
+            <span class="switchtxt">SO</span>
+        </div>
+
+        <div>
+            <span class="switchtxt">SWAP</span>
+            <label class="switch">
+                <input type="checkbox" id="swapSwitch">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+
     <h1>Chess'owa</h1>
 
     <div id="game">
         <div class="panel" id="playerPanel">
-            <div id="playerStatus"></div><br>
+            <div id="playerStatus"></div>
+            <div id="playerLastSpell"><b>Last Spell:</b> None</div><br>
             <div id="playerHand"></div><br>
             <div id="playerGraveyard"></div>
         </div>
@@ -304,7 +403,8 @@
         <div id="board"></div>
 
         <div class="panel" id="aiPanel">
-            <div id="aiStatus"></div><br>
+            <div id="aiStatus"></div>
+            <div id="aiLastSpell"><b>Last Spell:</b> None</div><br>
             <div id="aiHand"></div><br>
             <div id="aiGraveyard"></div>
         </div>
@@ -323,6 +423,9 @@
 
     <script>
         /* ================= CONSTANTS ================= */
+        const THEME_KEY = "board_theme";
+        const SWAP_KEY = "swap_sides";
+
         const ICON = {
             player: {
                 king: "♔",
@@ -399,6 +502,82 @@
             }
         };
 
+        const ALT_PIECE_IMAGES = {
+            player: {
+                pawn: [
+                    "images_alt/player/pawn-1.png",
+                    "images_alt/player/pawn-2.png",
+                    "images_alt/player/pawn-3.png",
+                    "images_alt/player/pawn-4.png",
+                    "images_alt/player/pawn-5.png",
+                    "images_alt/player/pawn-6.png",
+                    "images_alt/player/pawn-7.png",
+                    "images_alt/player/pawn-8.png"
+                ],
+                rook: ["images_alt/player/rook-1.png", "images_alt/player/rook-2.png"],
+                bishop: ["images_alt/player/bishop-1.png", "images_alt/player/bishop-2.png"],
+                knight: ["images_alt/player/knight-1.png", "images_alt/player/knight-2.png"],
+                queen: ["images_alt/player/queen-1.png"],
+                king: ["images_alt/player/king-1.png"]
+            },
+            ai: {
+                pawn: [
+                    "images_alt/ai/pawn-1.png",
+                    "images_alt/ai/pawn-2.png",
+                    "images_alt/ai/pawn-3.png",
+                    "images_alt/ai/pawn-4.png",
+                    "images_alt/ai/pawn-5.png",
+                    "images_alt/ai/pawn-6.png",
+                    "images_alt/ai/pawn-7.png",
+                    "images_alt/ai/pawn-8.png"
+                ],
+                rook: ["images_alt/ai/rook-1.png", "images_alt/ai/rook-2.png"],
+                bishop: ["images_alt/ai/bishop-1.png", "images_alt/ai/bishop-2.png"],
+                knight: ["images_alt/ai/knight-1.png", "images_alt/ai/knight-2.png"],
+                queen: ["images_alt/ai/queen-1.png"],
+                king: ["images_alt/ai/king-1.png"]
+            }
+        };
+
+        const SPELLS = {
+            Flare: {
+                cost: 3,
+                dmg: 200
+            },
+            Ultima: {
+                cost: 5,
+                dmg: 400
+            },
+            Requiem: {
+                cost: 7,
+                dmg: 800
+            },
+            'Life I': {
+                cost: 2,
+                revive: 1
+            },
+            'Life II': {
+                cost: 4,
+                revive: 2
+            },
+            'Haste I': {
+                cost: 3,
+                draw: 1
+            },
+            'Haste II': {
+                cost: 5,
+                draw: 2
+            },
+            Dispel: {
+                cost: 4
+            },
+            Break: {
+                cost: 7
+            }
+        };
+
+        let ACTIVE_IMAGES = PIECE_IMAGES;
+
         const BASE = {
             king: 200,
             queen: 150,
@@ -436,7 +615,8 @@
                 dead: [],
                 pawn: 0,
                 lastSpell: "",
-                nextSpell: null
+                nextSpell: null,
+                extraPlacement: false
             },
             ids: {
                 player: {},
@@ -459,6 +639,7 @@
         let lastPlacedC = null;
 
         /* ================= SETUP ================= */
+
         function makeDeck(o) {
             let d = [{
                 type: "king"
@@ -487,17 +668,25 @@
             const idx = Math.floor(Math.random() * player.deck.length);
             const card = player.deck.splice(idx, 1)[0];
 
-            card.img = assignPieceImage(card.owner, card.type); // ⭐ key fix
+            // Assign ID first
             card.id = uid(card.owner, card.type);
+
+            // Then assign the image
+            card.img = assignPieceImage(card.owner, card.type, card.id);
 
             player.hand.push(card);
         }
 
         function drawUntil(p, min = 3) {
             while (p.hand.length < min && p.deck.length) {
-                const card = p.deck.splice(Math.random() * p.deck.length | 0, 1)[0];
-                card.img = assignPieceImage(card.owner, card.type);
+                const card = p.deck.splice(Math.floor(Math.random() * p.deck.length), 1)[0];
+
+                // Assign ID first
                 card.id = uid(card.owner, card.type);
+
+                // Then assign the image
+                card.img = assignPieceImage(card.owner, card.type, card.id);
+
                 p.hand.push(card);
             }
         }
@@ -530,6 +719,126 @@
         }
 
         /* ================= HELPERS ================= */
+        function loadSavedTheme() {
+            const theme = localStorage.getItem(THEME_KEY);
+            const swap = localStorage.getItem(SWAP_KEY) === "true";
+
+            // Theme
+            if (theme === "alt") {
+                ACTIVE_IMAGES = ALT_PIECE_IMAGES;
+                document.getElementById("imageSwitch").checked = true;
+            } else {
+                ACTIVE_IMAGES = PIECE_IMAGES;
+                document.getElementById("imageSwitch").checked = false;
+            }
+
+            // Swap sides
+            document.getElementById("swapSwitch").checked = swap;
+            updateSpellButtonText();
+            updateLastSpellDisplay();
+        }
+
+        document.getElementById("imageSwitch").addEventListener("change", function() {
+            const isAlt = this.checked;
+
+            if (isAlt) {
+                ACTIVE_IMAGES = ALT_PIECE_IMAGES;
+                localStorage.setItem(THEME_KEY, "alt");
+            } else {
+                ACTIVE_IMAGES = PIECE_IMAGES;
+                localStorage.setItem(THEME_KEY, "default");
+            }
+
+            // 1. Load saved toggle values
+            loadSavedTheme();
+
+            // 2. NOW that decks already exist, update images
+            updateAllPieceImages();
+
+            updateSpellButtonText();
+            updateLastSpellDisplay();
+            updateAiLastSpellDisplay();
+
+            // 3. Render UI
+            render();
+        });
+
+        function updateSpellButtonText() {
+            const spellsDiv = document.getElementById("spells");
+            spellsDiv.innerHTML = "<b>Spells</b><br>";
+
+            Object.keys(SPELLS).forEach(baseName => {
+                const s = SPELLS[baseName];
+                const b = document.createElement("button");
+
+                const displayName = getSpellName(baseName);
+
+                b.textContent = displayName.toUpperCase() + " (" + s.cost + " MP)";
+                b.classList.add("shiny-button");
+
+                b.onclick = () => {
+                    if (G.turn !== "player") return;
+                    castSpell(G.player, G.ai, baseName); // IMPORTANT: still use baseName
+                };
+
+                if (!canCastSpell(G.player, baseName) || G.spellUsed) {
+                    b.disabled = true;
+                    b.style.opacity = 0.4;
+                }
+
+                spellsDiv.appendChild(b);
+            });
+        }
+
+        function getSpellName(baseName) {
+            const swap = document.getElementById("swapSwitch").checked;
+            const image = document.getElementById("imageSwitch").checked;
+
+            // IMAGE SWITCH OVERRIDE (highest priority)
+            if (image) {
+                const imageMap = {
+                    "Flare": "Flame Charge I",
+                    "Ultima": "Flame Charge II",
+                    "Requiem": "Flame Charge III",
+                    "Life I": "Revive I",
+                    "Life II": "Revive II",
+                    "Haste I": "Reinforce I",
+                    "Haste II": "Reinforce II",
+                    "Dispel": "Enfeeble I",
+                    "Break": "Enfeeble II"
+                };
+                return imageMap[baseName] || baseName;
+            }
+
+            // SWAP ONLY (rename first three)
+            if (swap) {
+                const swapMap = {
+                    "Flare": "Barrage",
+                    "Ultima": "Omnislash",
+                    "Requiem": "Renzokuken"
+                };
+                return swapMap[baseName] || baseName;
+            }
+
+            // DEFAULT
+            return baseName;
+        }
+
+        function updateLastSpellDisplay() {
+            const lastSpellDiv = document.getElementById("playerLastSpell");
+            if (!G.player.lastSpell) {
+                lastSpellDiv.innerHTML = "<b>Last Spell:</b> None";
+            } else {
+                lastSpellDiv.innerHTML = "<b>Last Spell:</b> " + getSpellName(G.player.lastSpell);
+            }
+        }
+
+        function updateAiLastSpellDisplay() {
+            const div = document.getElementById("aiLastSpell");
+            if (!G.ai.lastSpell) div.innerHTML = "<b>Last Spell:</b> None";
+            else div.innerHTML = "<b>Last Spell:</b> " + getSpellName(G.ai.lastSpell);
+        }
+
         const ortho = (r, c) => [
             r > 0 ? [r - 1, c] : null,
             r < 7 ? [r + 1, c] : null,
@@ -624,10 +933,19 @@
             return libs.size;
         }
 
-        function assignPieceImage(owner, type) {
-            const pool = PIECE_IMAGES[owner][type];
+        function assignPieceImage(owner, type, id) {
+            const swap = document.getElementById("swapSwitch").checked;
+
+            // Apply swap here
+            const actualOwner = swap ?
+                (owner === "player" ? "ai" : "player") :
+                owner;
+
+            const pool = ACTIVE_IMAGES[actualOwner][type];
             if (!pool || !pool.length) return "";
-            return pool.shift();
+
+            const idNumber = parseInt(id.split("-")[2]) - 1;
+            return pool[idNumber % pool.length];
         }
 
         function resolveSurroundForPlacement(owner, r, c) {
@@ -652,8 +970,54 @@
             });
         }
 
+        function recalculateAllAttack() {
+            // 1️⃣ Reset to base (unless broken)
+            G.board.flat().forEach(p => {
+                if (!p) return;
+
+                if (p.broken) {
+                    p.atk = 0;
+                } else {
+                    p.atk = BASE[p.type];
+                }
+            });
+
+            // 2️⃣ Reapply all auras
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const piece = G.board[r][c];
+                    if (!piece || piece.silenced || piece.broken) continue;
+
+                    adj(r, c).forEach(([rr, cc]) => {
+                        const neighbor = G.board[rr][cc];
+                        if (!neighbor || neighbor.silenced || neighbor.broken) return;
+
+                        // Bishop buff
+                        if (
+                            neighbor.type === "bishop" &&
+                            neighbor.owner === piece.owner
+                        ) {
+                            piece.atk += 50;
+                        }
+
+                        // Queen debuff
+                        if (neighbor.type === "queen") {
+                            piece.atk -= 50;
+                        }
+                    });
+                }
+            }
+
+            // 3️⃣ Clamp to 0 minimum
+            G.board.flat().forEach(p => {
+                if (!p) return;
+                if (p.atk < 0) p.atk = 0;
+            });
+        }
+
         /* ================= ABILITIES ================= */
         function applyAbility(p, r, c) {
+            if (p.silenced) return;
             let me = p.owner === "player" ? G.player : G.ai;
             let op = p.owner === "player" ? G.ai : G.player;
 
@@ -687,49 +1051,32 @@
                     let killed = G.board[tr][tc];
                     G.board[tr][tc] = null;
                     op.dead.push(killed);
-                    
+
                     if (p.owner === "player") {
                         popup("🗡️ Captured", "dodgerblue");
                         return;
                     } else {
                         popup("🗡️ Captured", "firebrick");
-                        }
+                    }
                 }
             }
         }
 
-        function applyAuraFromNeighbors(piece, r, c) {
-            adj(r, c).forEach(([rr, cc]) => {
-                const neighbor = G.board[rr][cc];
-                if (!neighbor) return;
-
-                // Bishop aura (friendly buff)
-                if (neighbor.type === "bishop" && neighbor.owner === piece.owner) {
-                    piece.atk += 50;
-                }
-
-                // Queen aura (enemy debuff)
-                if (neighbor.type === "queen") {
-                    piece.atk -= 50;
-                }
-            });
-        }
 
         function resolveKingChoice(choice) {
             if (choice === "damage") {
                 G.ai.hp -= 200;
-                popup("⚔️ King Attacks!", "dodgerblue");
+                popup("⚔️ Opponent loses HP", "dodgerblue");
             } else {
                 G.ai.mp = Math.max(0, G.ai.mp - 2);
-                popup("Enemy loses MP", "dodgerblue");
+                popup("✨ Opponent loses MP", "dodgerblue");
             }
             modal.style.display = "none";
             G.kingPending = null;
 
             // ⭐ FINALIZE placement flow
-            resolveSurroundForPlacement("player", lastPlacedR, lastPlacedC);
-
-            resolveSurround();
+            resolveSurroundAt(lastPlacedR, lastPlacedC, "player");
+            recalculateAllAttack();
             render();
         }
 
@@ -873,12 +1220,16 @@
                 G.board[r][c] = null;
                 (killed.owner === "player" ? G.player : G.ai).dead.push(killed);
             });
+
+
+            recalculateAllAttack();
+
             if (owner === "player") {
-                        popup("🗡️ Captured", "dodgerblue");
-                        return;
-                    } else {
-                        popup("🗡️ Captured", "firebrick");
-                        }
+                popup("🗡️ Captured", "dodgerblue");
+                return;
+            } else {
+                popup("🗡️ Captured", "firebrick");
+            }
         }
 
         /* ================= POPUP ================= */
@@ -936,42 +1287,6 @@
         }
 
         /* ================= SPELLS ================= */
-        const SPELLS = {
-            Flare: {
-                cost: 3,
-                dmg: 200
-            },
-            Ultima: {
-                cost: 5,
-                dmg: 400
-            },
-            Requiem: {
-                cost: 7,
-                dmg: 800
-            },
-            'Life I': {
-                cost: 2,
-                revive: 1
-            },
-            'Life II': {
-                cost: 4,
-                revive: 2
-            },
-            'Haste I': {
-                cost: 3,
-                draw: 1
-            },
-            'Haste II': {
-                cost: 5,
-                draw: 2
-            },
-            Dispel: {
-                cost: 4
-            },
-            Break: {
-                cost: 7
-            }
-        };
 
         function revive(owner, n) {
             let side = owner === "player" ? G.player : G.ai;
@@ -995,10 +1310,9 @@
             if (s.dmg) {
                 target.hp -= s.dmg;
                 if (caster === G.player) {
-                    popup("🔥 " + caster.lastSpell, "dodgerblue");
-                    return;
+                    popup("🔥 " + getSpellName(caster.lastSpell), "dodgerblue");
                 } else {
-                    popup("🔥 " + caster.lastSpell, "firebrick");
+                    popup("🔥 " + getSpellName(caster.lastSpell), "firebrick");
                 }
             }
 
@@ -1006,12 +1320,11 @@
                 if (caster === G.player) {
                     reviveQueue = Array(s.revive).fill(true);
                     popup("Select pieces to revive", "dodgerblue");
-                    return;
                 } else {
                     for (let i = 0; i < s.revive; i++) {
                         const g = caster.dead.pop();
                         if (g) caster.hand.push(g);
-                        popup("🪽 " + caster.lastSpell, "firebrick");
+                        popup("🪽 " + getSpellName(caster.lastSpell), "firebrick");
                     }
                 }
             }
@@ -1019,23 +1332,54 @@
             if (s.draw) {
                 for (let i = 0; i < s.draw; i++) draw(caster);
                 if (caster === G.player) {
-                        popup("💫 " + caster.lastSpell, "dodgerblue");
-                        return;
+                    popup("💫 " + getSpellName(caster.lastSpell), "dodgerblue");
                 } else {
-                        popup("💫 " + caster.lastSpell, "firebrick");
-                    }
+                    popup("💫 " + getSpellName(caster.lastSpell), "firebrick");
+                }
             }
 
-            if (name === "Dispel" || name === "Break") {
+            if (name === "Dispel") {
                 G.board.flat().forEach(p => {
-                    if (p) p.atk = name === "Break" ? 0 : BASE[p.type];
-                });
-                if (caster === G.player) {
-                        popup("💫 " + caster.lastSpell, "dodgerblue");
-                        return;
-                } else {
-                        popup("💫 " + caster.lastSpell, "firebrick");
+                    if (!p) return;
+
+                    p.silenced = true;
+
+                    // Only reset attack if NOT broken
+                    if (!p.broken) {
+                        p.atk = BASE[p.type];
                     }
+                });
+
+                if (caster === G.player) {
+                    popup("🚫 " + getSpellName("Dispel"), "dodgerblue");
+                } else {
+                    popup("🚫 " + getSpellName("Dispel"), "firebrick");
+                }
+
+                recalculateAllAttack();
+            }
+
+            if (name === "Break") {
+                G.board.flat().forEach(p => {
+                    if (!p) return;
+                    p.silenced = true;
+                    p.broken = true;
+                    p.atk = 0;
+                });
+
+                if (caster === G.player) {
+                    popup("⛓️‍💥  " + getSpellName("Break"), "dodgerblue");
+                } else {
+                    popup("⛓️‍💥  " + getSpellName("Break"), "firebrick");
+                }
+
+                recalculateAllAttack();
+            }
+
+            if (caster === G.player) {
+                updateLastSpellDisplay();
+            } else {
+                updateAiLastSpellDisplay();
             }
 
             render();
@@ -1049,7 +1393,9 @@
             sel = null;
 
             G.board.flat().forEach(p => {
-                if (p && p.owner === o && p.type === "rook") p.atk += 50;
+                if (p && p.owner === o && p.type === "rook" && !p.silenced) {
+                    p.atk += 50;
+                }
             });
         }
 
@@ -1065,7 +1411,9 @@
                 owner,
                 type: card.type,
                 atk: BASE[card.type],
-                img: card.img
+                img: card.img,
+                silenced: false,
+                broken: false
             };
 
             G.board[r][c] = piece;
@@ -1086,8 +1434,13 @@
             // Pawn bonus
             if (card.type === "pawn") {
                 playerObj.pawn++;
-                if (owner === "player" && playerObj.pawn % 3 === 0) {
-                    G.placements += 1; // extra placement
+
+                if (playerObj.pawn % 3 === 0) {
+                    if (owner === "player") {
+                        G.placements += 1;
+                    } else {
+                        G.ai.extraPlacement = true;
+                    }
                 }
             }
 
@@ -1112,8 +1465,43 @@
                 return;
             }
 
+            // ===== AI KING ABILITY =====
+            if (owner === "ai" && card.type === "king") {
+
+                const requiemCost = SPELLS["Requiem"].cost;
+                const playerMP = G.player.mp;
+
+                let useMPDrain = false;
+
+                // 1️⃣ If player cannot meaningfully lose MP
+                if (playerMP < 2) {
+                    useMPDrain = false; // always damage
+                }
+
+                // 2️⃣ If player is within 2 MP of casting Requiem
+                else if (playerMP >= requiemCost - 2) {
+                    useMPDrain = true;
+                }
+
+                // 3️⃣ Otherwise bias toward damage but sometimes drain
+                else {
+                    useMPDrain = Math.random() < 0.35;
+                }
+
+                if (useMPDrain) {
+                    G.player.mp = Math.max(0, G.player.mp - 2);
+                    popup("✨ Player loses MP", "firebrick");
+                } else {
+                    G.player.hp -= 200;
+                    popup("⚔️ Player loses HP", "firebrick");
+                }
+
+                render();
+            }
+
+
             applyAbility(piece, r, c);
-            applyAuraFromNeighbors(piece, r, c);
+            recalculateAllAttack();
 
             // Surround enemies
             resolveSurroundAt(r, c, owner);
@@ -1312,13 +1700,33 @@
             }
 
             /* ================= EXECUTE MOVE ================= */
-            const move = candidateMoves[Math.floor(Math.random() * candidateMoves.length)];
+            function aiPlaceOnce() {
+                const move = candidateMoves[Math.floor(Math.random() * candidateMoves.length)]; const cardIndex = Math.floor(Math.random() * G.ai.hand.length); const card = G.ai.hand[cardIndex]; placePiece("ai", card, move.r, move.c);
+                render();
+                return true;
+            }
 
-            const cardIndex = Math.floor(Math.random() * G.ai.hand.length);
-            const card = G.ai.hand[cardIndex];
+            function aiPlaceSequence() {
 
-            placePiece("ai", card, move.r, move.c);
+                // First placement
+                const placed = aiPlaceOnce();
 
+                if (!placed) return;
+
+                // Check AFTER placement if pawn triggered bonus
+                if (G.ai.extraPlacement) {
+                    G.ai.extraPlacement = false;
+
+                    setTimeout(() => {
+                        aiPlaceOnce();
+                    }, 1000);
+                }
+            }
+            
+            setTimeout(() => {
+                    aiPlaceSequence();
+                }, 1000);
+            
             /* ================= SPELL PHASE ================= */
             const spellName = aiCastSpell();
 
@@ -1339,10 +1747,12 @@
                         render();
                     });
 
-                }, 900);
+                }, 1000);
             };
-
+            
+            setTimeout(() => {
                 resolveAiDamage();
+                }, 1000);
         }
 
 
@@ -1387,8 +1797,7 @@
             playerStatus.innerHTML = `
     <b>Player</b><br>
     HP: ${G.player.hp} MP: ${G.player.mp}<br>
-    Placements: ${G.placements}<br>
-    Last Spell: ${G.player.lastSpell || "None"}
+    Placements: ${G.placements}
   `;
 
             // ===== PLAYER HAND =====
@@ -1396,7 +1805,10 @@
             G.player.hand.forEach((p, i) => {
                 let b = document.createElement("button");
                 b.innerHTML = `
-  <img src="${p.img}" style="width:60px;height:60px;vertical-align:middle">
+  <div class="icon" style="width:60px;height:60px">
+    <img src="${p.img}" style="width:60px;height:60px;">
+  </div>
+  <div class="atk handatk" style="color:#9fd3ff;">${BASE[p.type]}</div>
 `;
                 b.classList.add("glint", "handpadding");
                 if (i === sel) b.classList.add("selected");
@@ -1413,8 +1825,12 @@
             playerGraveyard.innerHTML = "<b>Graveyard</b><br>";
             G.player.dead.forEach((p, i) => {
                 const span = document.createElement("span");
+                span.classList.add("graveIcon");
                 span.innerHTML = `
-  <img src="${p.img}" style="width:60px;height:60px">
+  <div class="icon" style="width:60px;height:60px">
+    <img src="${p.img}" style="width:60px;height:60px;">
+  </div>
+  <div class="atk graveyardatk" style="color:#9fd3ff;">${BASE[p.type]}</div>
 `;
                 span.onclick = () => selectRevive('player', i);
                 playerGraveyard.appendChild(span);
@@ -1424,7 +1840,7 @@
             aiStatus.innerHTML = `
     <b>Opponent</b><br>
     HP: ${G.ai.hp} MP: ${G.ai.mp}<br>
-    Last Spell: ${G.ai.lastSpell || "None"}
+    Placements: ${G.placements}
   `;
 
             // ===== AI HAND =====
@@ -1432,7 +1848,10 @@
             G.ai.hand.forEach((p, i) => {
                 const b = document.createElement("button");
                 b.innerHTML = `
-  <img src="${p.img}" style="width:60px;height:60px;vertical-align:middle;opacity:0.7">
+  <div class="icon" style="width:60px;height:60px">
+    <img src="${p.img}" style="width:60px;height:60px;">
+  </div>
+  <div class="atk handatk" style="color:#ff9f9f;">${BASE[p.type]}</div>
 `;
                 b.classList.add("handpadding");
                 b.disabled = true; // AI hand cards are not selectable
@@ -1444,8 +1863,12 @@
             G.ai.dead.forEach(p => {
                 const span = document.createElement("span");
                 aiGraveyard.appendChild(span);
+                span.classList.add("graveIcon");
                 span.innerHTML = `
-  <img src="${p.img}" style="width:60px;height:60px">
+  <div class="icon" style="width:60px;height:60px">
+    <img src="${p.img}" style="width:60px;height:60px;">
+  </div>
+  <div class="atk graveyardatk" style="color:#ff9f9f;">${BASE[p.type]}</div>
 `;
             });
 
@@ -1484,25 +1907,9 @@
             }
 
             // ===== SPELLS =====
-            spells.innerHTML = "<b>Spells</b><br>";
-            Object.keys(SPELLS).forEach(name => {
-                const s = SPELLS[name];
-                const b = document.createElement("button");
-                b.textContent = `${name.toUpperCase()} (${s.cost} MP)`;
-                b.classList.add("shiny-button");
-                b.onclick = () => {
-                    if (G.turn !== "player") return;
-                    castSpell(G.player, G.ai, name);
-                };
-
-                if (!canCastSpell(G.player, name) || G.spellUsed) {
-                    b.disabled = true;
-                    b.style.opacity = 0.4;
-                    b.classList.remove("shiny-button");
-                }
-
-                spells.appendChild(b);
-            });
+            updateSpellButtonText();
+            updateLastSpellDisplay();
+            updateAiLastSpellDisplay();
         }
 
         // Decide who starts
@@ -1521,8 +1928,53 @@
             aiTurn(); // aiTurn now handles placement, abilities, spellcasting, and damage
         }
 
-        // Render everything
+        // 1. Load saved toggle values
+        loadSavedTheme();
+
+        // 2. NOW that decks already exist, update images
+        updateAllPieceImages();
+
+        // 3. Render UI
         render();
+
+        document.getElementById("swapSwitch").addEventListener("change", function() {
+            const swap = this.checked;
+            localStorage.setItem(SWAP_KEY, swap ? "true" : "false");
+
+            // 1. Load saved toggle values
+            loadSavedTheme();
+
+            // 2. NOW that decks already exist, update images
+            updateAllPieceImages();
+
+            updateSpellButtonText();
+            updateLastSpellDisplay();
+
+
+            // 3. Render UI
+            render();
+        });
+
+        function updateAllPieceImages() {
+            const swap = document.getElementById("swapSwitch").checked;
+
+            function getImage(p) {
+                return assignPieceImage(p.owner, p.type, p.id);
+            }
+            // Update board
+            G.board.flat().forEach(p => {
+                if (!p) return;
+                p.img = getImage(p);
+            });
+
+            // Update hands
+            G.player.hand.forEach(p => p.img = getImage(p));
+            G.ai.hand.forEach(p => p.img = getImage(p));
+
+            // Update graveyards
+            G.player.dead.forEach(p => p.img = getImage(p));
+            G.ai.dead.forEach(p => p.img = getImage(p));
+        }
 
     </script>
 
